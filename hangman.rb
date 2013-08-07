@@ -43,7 +43,7 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 
 # popularity of letters in dictionary words grouped by the length of those words
 PopularityOfLettersData = <<-EOF
-1  2	3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20
+1  2  3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20
 #1	A	A	A	A	S	E	E	E	E	E	E	E	I	I	I	I	I	I	I	I
 #2	I	O	E	E	E	S	S	S	S	I	I	I	E	E	E	E	E	S	E	O
 #3	.	E	O	S	A	A	I	I	I	S	S	S	N	T	T	T	T	E	T	E
@@ -81,11 +81,12 @@ PopularityOfLettersInLength = data_lines[0].inject({}) do |h, idx|
 end
 
 # 获取单词列表
+# http://nifty.stanford.edu/2011/schwarz-evil-hangman/dictionary.txt
 words = (File.read("/Users/mvj3/github/joycehan/strikingly-interview-test-instructions/data/words.txt").split("\n") + %w[a i]).map(&:upcase)
 
 # 建立有位置信息的字母 映射到 单词 的哈希表
 # 比如 { :o1 => [:word, :wood] }
-length_to__char_num_to_words__hash = words.inject({}) do |h, w|
+Length_to__char_num_to_words__hash = words.inject({}) do |h, w|
   h[w.length] ||= {}
   w.chars.each_with_index do |c, c_idx|
     _sym = "#{c}#{c_idx}".to_sym
@@ -95,34 +96,83 @@ length_to__char_num_to_words__hash = words.inject({}) do |h, w|
   h
 end
 
-length_to__char_num_to_words__hash.keys
+Length_to__char_num_to_words__hash.keys
 
-w1 = "COMAKER"
+class Enumerator
+  def frequencies
+    group_by {|c| c }.map {|c, cs| [c, cs.length] }
+  end
+end
 
 def select_first_guess_character_in_range range
-  (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.group_by {|c| c }.map {|c, cs| [c, cs.length] }].first || {})[0]
+  (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].first || {})[0]
 end
 
 def match_result w, c
   w.chars.map {|c1| (c == c1) ? c : '*' }.join
 end
 
-def guess_word range
-  match_count = 0
-  guess_char = nil
-  guess_time = 0
-  # 1. 依次试(most frequent character in the range) => match words with length
-  PopularityOfLettersInLength[w1.length].each do |c|
-    guess_time += 1
-    guess_char = c
-    _result = match_result(w1, c)
-    _count  = _result.count('*')
-    match_count += (w1.length - _count)
-    break if match_count > 0
-  end
+# 依据上面匹配字母及其位置找到所有符合单词，
+# 并求出接下来的字母及其位置
+def char_with_idx__to__rest _char_with_idx_array, _word_length, _guessed_chars
+  _rest_matched_chars_order_by_count = _char_with_idx_array.map do |_char_with_idx|
+    Length_to__char_num_to_words__hash[_word_length][_char_with_idx]
+  end.flatten.uniq.map(&:to_s).join.chars.frequencies.map(&:first)
+  _rest_matched_chars_order_by_count -= _guessed_chars
 end
 
-guess_word 1..8
+def matched_char_with_idx_in_str _result
+  _a = []
+  _result.chars.each_with_index do |c1, idx|
+    _a << "#{c1}#{idx}".to_sym if c1 != '*'
+  end
+  _a
+end
+
+def guess_word range, w1
+  w1.upcase!
+  w1_length = w1.length
+  match_count = 0
+  guess_time = 0
+  result = nil
+  char_with_idx_array = []
+  guessed_chars = []
+
+  # 找出第一个匹配的字母及其一或多个位置
+  PopularityOfLettersInLength[w1_length].each do |c1|
+    guess_time += 1
+    guessed_chars << c1
+    result = match_result(w1, c1)
+    puts "#{c1}: #{result}"
+    match_count += (w1_length - result.count('*'))
+    if match_count > 0
+      char_with_idx_array += matched_char_with_idx_in_str(result)
+      break
+    end
+  end
+
+  # 退出，比如只有一两个字母
+  return guess_time if char_with_idx_array.length == w1_length
+
+  # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
+  while (match_count != w1_length) do
+    char_with_idx__to__rest(char_with_idx_array, w1_length, guessed_chars).each do |c1|
+      guess_time += 1
+      result = match_result w1, c1
+      puts "#{c1}: #{result}"
+      _count = (w1_length - result.count('*'))
+      match_count += _count
+      char_with_idx_array += matched_char_with_idx_in_str(result)
+      guessed_chars << c1
+      break if _count > 0
+    end
+  end
+
+  puts guess_time
+  guess_time
+end
+
+guess_word 1..8, "COMAKER"
 
 
 # 开始猜测单词
@@ -131,4 +181,32 @@ guess_word 1..8
 
   20.times do |idx|
   end
-end
+end if nil
+
+__END__
+irb(main):497:0> guess_word 1..8, "COMAKER"
+***A***
+*******
+*******
+*******
+*******
+*O*****
+**M****
+*******
+*******
+C******
+*******
+******R
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+*******
+****K**
+=> 25
