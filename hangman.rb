@@ -19,6 +19,11 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 
 # 核心思想是贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
 #
+#
+# [?]用字母位置信息 解决统计的字母非关联缺陷
+# http://www.datagenetics.com/blog/april12012/index.html
+# Let me give an example: If we have a six letter word, our first letter to guess should be 'E'. If the letter 'E' is not in the solution, we should not necessarily try the letter 'S' next (which is what the above table implies)!
+#
 # 复杂度估计
 # a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
 # b. 最少是该单词唯一字母的个数，所以一般来说底线是单词长度。
@@ -43,7 +48,10 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # 1. 使用Symbol节省内存
 # 2. 使用Hash O(1) 查找
 #
-# 猜词策略，元音和辅音间隔猜。
+# 问题
+# a. 猜词策略，元音和辅音间隔猜。
+# b. 一般不能超过十次，现在平均是十二次
+#
 #
 #
 # 作为一个程序员，我先是选择算法和其他现成做法
@@ -54,39 +62,40 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # http://zh.wikipedia.org/wiki/字母频率
 # https://github.com/fredley/pyngman/blob/master/pyngman.py
 # https://docs.google.com/document/d/18s9i0SKThDasIAb3WgTxxSkz2QEjAT9sVyJFQXMpB1I/edit 七种武器：从一个算法的多语言实现看编程语言的横向对比
+# http://stackoverflow.com/questions/16223305/algorithm-for-classifying-words-for-hangman-difficulty-levels-as-easy-medium
 # 
 
 
 # popularity of letters in dictionary words grouped by the length of those words
 # copied from http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
 PopularityOfLettersData = <<-EOF
-1  2  3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20
-#1	A	A	A	A	S	E	E	E	E	E	E	E	I	I	I	I	I	I	I	I
-#2	I	O	E	E	E	S	S	S	S	I	I	I	E	E	E	E	E	S	E	O
-#3	.	E	O	S	A	A	I	I	I	S	S	S	N	T	T	T	T	E	T	E
-#4	.	I	I	O	R	R	A	A	R	R	N	N	T	S	N	S	N	T	O	T
-#5	.	M	T	I	O	I	R	R	A	A	A	T	S	N	S	N	S	O	N	R
-#6	.	H	S	R	I	O	N	N	N	N	R	A	A	A	O	A	O	N	A	S
-#7	.	N	U	L	L	L	T	T	T	T	T	R	O	O	A	O	A	R	S	A
-#8	.	U	P	T	T	N	O	O	O	O	O	O	R	R	R	R	R	A	R	N
-#9	.	S	R	N	N	T	L	L	L	L	L	L	L	L	L	L	L	L	L	C
-#10	.	T	N	U	U	D	D	D	C	C	C	C	C	C	C	C	C	C	C	L
-#11	.	Y	D	D	D	U	U	C	D	D	U	P	P	P	P	P	P	P	P	P
-#12	.	B	B	P	C	C	C	U	U	U	D	U	U	U	U	U	U	M	M	H
-#13	.	L	G	M	Y	M	G	G	G	G	P	M	M	M	M	M	M	U	U	U
-#14	.	P	M	H	P	P	P	M	M	M	M	D	G	D	D	H	H	H	H	M
-#15	.	X	Y	C	M	G	M	P	P	P	G	G	D	H	H	D	D	D	D	Y
-#16	.	D	L	B	H	H	H	H	H	H	H	H	H	G	G	Y	G	G	G	D
-#17	.	F	H	K	G	B	B	B	B	B	B	Y	Y	Y	Y	G	Y	Y	Y	G
-#18	.	R	W	G	B	Y	Y	Y	Y	Y	Y	B	B	B	B	B	B	B	B	B
-#19	.	W	F	Y	K	K	F	F	F	F	F	V	V	V	V	V	V	V	V	Z
-#20	.	G	C	W	F	F	K	K	V	V	V	F	F	F	F	F	F	Z	F	V
-#21	.	J	K	F	W	W	W	W	K	K	K	Z	Z	Z	Z	Z	Z	F	Z	F
-#22	.	K	X	V	V	V	V	V	W	W	W	K	X	X	X	X	X	X	X	K
-#23	.	.	V	J	Z	Z	Z	Z	Z	Z	Z	W	K	K	W	W	Q	Q	K	X
-#24	.	.	J	Z	X	X	X	X	X	X	X	X	W	W	K	Q	W	W	J	J
-#25	.	.	Z	X	J	J	J	Q	Q	Q	Q	Q	Q	Q	Q	K	J	K	Q	Q
-#26	.	.	Q	Q	Q	Q	Q	J	J	J	J	J	J	J	J	J	K	.	W	.
+    1 2 3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20
+#1	A	A	A	A	S	E	E	E	E E   E   E   I   I   I   I   I   I   I   I
+#2	I	O	E	E	E	S	S	S	S I   I   I   E   E   E   E   E   S   E   O
+#3	.	E	O	S	A	A	I	I	I S   S   S   N   T   T   T   T   E   T   E
+#4	.	I	I	O	R	R	A	A	R R   N   N   T   S   N   S   N   T   O   T
+#5	.	M	T	I	O	I	R	R	A A   A   T   S   N   S   N   S   O   N   R
+#6	.	H	S	R	I	O	N	N	N N   R   A   A   A   O   A   O   N   A   S
+#7	.	N	U	L	L	L	T	T	T T   T   R   O   O   A   O   A   R   S   A
+#8	.	U	P	T	T	N	O	O	O O   O   O   R   R   R   R   R   A   R   N
+#9	.	S	R	N	N	T	L	L	L L   L   L   L   L   L   L   L   L   L   C
+#10	.	T	N	U	U	D	D	D	C C   C   C   C   C   C   C   C   C   C   L
+#11	.	Y	D	D	D	U	U	C	D D   U   P   P   P   P   P   P   P   P   P
+#12	.	B	B	P	C	C	C	U	U U   D   U   U   U   U   U   U   M   M   H
+#13	.	L	G	M	Y	M	G	G	G G   P   M   M   M   M   M   M   U   U   U
+#14	.	P	M	H	P	P	P	M	M M   M   D   G   D   D   H   H   H   H   M
+#15	.	X	Y	C	M	G	M	P	P P   G   G   D   H   H   D   D   D   D   Y
+#16	.	D	L	B	H	H	H	H	H H   H   H   H   G   G   Y   G   G   G   D
+#17	.	F	H	K	G	B	B	B	B B   B   Y   Y   Y   Y   G   Y   Y   Y   G
+#18	.	R	W	G	B	Y	Y	Y	Y Y   Y   B   B   B   B   B   B   B   B   B
+#19	.	W	F	Y	K	K	F	F	F F   F   V   V   V   V   V   V   V   V   Z
+#20	.	G	C	W	F	F	K	K	V V   V   F   F   F   F   F   F   Z   F   V
+#21	.	J	K	F	W	W	W	W	K K   K   Z   Z   Z   Z   Z   Z   F   Z   F
+#22	.	K	X	V	V	V	V	V	W W   W   K   X   X   X   X   X   X   X   K
+#23	.	.	V	J	Z	Z	Z	Z	Z Z   Z   W   K   K   W   W   Q   Q   K   X
+#24	.	.	J	Z	X	X	X	X	X X   X   X   W   W   K   Q   W   W   J   J
+#25	.	.	Z	X	J	J	J	Q	Q Q   Q   Q   Q   Q   Q   K   J   K   Q   Q
+#26	.	.	Q	Q	Q	Q	Q	J	J J   J   J   J   J   J   J   K   .   W   .
 EOF
 
 # 构造 {length => [character, ]}
@@ -272,7 +281,9 @@ ws2 = %w[affability kinglinesses papeteries bro ironer kyboshed hoodie settlors 
 
 if true
 _guess_counts_array = []
-ws = ws2.shuffle[0..79]
+ws = ws2 #.shuffle[0..79]
+ws = ws2.select {|w| w.length < 6 }
+ws = ws2.select {|w| w.length == 10 }
 ws.each do |w|
   _guess_counts_array << guess_word(1..13, w)
 end
@@ -300,6 +311,9 @@ end
 # [2013-08-08 15:43] 随机抽80个
 #   GUESS_AVG:12.0, GUESS_TOTAL:984, GUESS_COUNT_MEDIAN:12.0
 #   WORD_NUM:80, CHARS_COUNT_AVG:8, CHARS_COUNT_MEDIAN:8.0
+# [2013-08-08 16:35] 单词长度等于10
+#   GUESS_AVG:11.0, GUESS_TOTAL:1366, GUESS_COUNT_MEDIAN:11.0
+#   WORD_NUM:119, CHARS_COUNT_AVG:10, CHARS_COUNT_MEDIAN:10.0
 
 def gw word
   l = word.length
@@ -316,3 +330,5 @@ __END__
   20.times do |idx|
   end
 end if nil
+
+# TODO http://www.datagenetics.com/blog/april12012/index.html#result
