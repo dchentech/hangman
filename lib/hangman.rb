@@ -1,137 +1,145 @@
 # encoding: UTF-8
 
+require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
 
-# popularity of letters in dictionary words grouped by the length of those words
-# copied from http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
 class Hangman
+  attr_reader :source
+  attr_reader :guessed_chars, :matched_words
 
-  def select_guess_chars_order_by_frequency_in_range range
-    Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].keys
+  attr_reader :logger
+
+  def initialize source
+    @source = source
+
+    @logger = Logger.new($stdout)
+
+    # check @source's methods
+    [:word, :make_a_guess, :give_me_a_word].each do |m|
+      raise "#{@source}'s class #{@source.class} havent defined method :#{m}" if not @source.methods.include? m
+    end
+
+    @guessed_chars = []
+    @matched_words = nil
+
+    return self
   end
 
-  # return "**N***N"
-  def match_result w, c
-    w.chars.map {|c1| (c == c1) ? c : '*' }.join
+  # delegate behaviors to @source
+  def word; @source.word end
+  def done?; word.count('*').zero? end
+  def init_guess; @source.give_me_a_word end
+
+  def guess
+    raise "Please #init_guess first" if word.nil?
+
+    # 退出，比如全部都是重复字母，包括一两个字母，比如A, AA
+    return false if matched_char_with_idx_in_str.length == word_length
+
+    _old_asterisk_count = word.count('*')
+
+    @source.make_a_guess current_guess_char
+
+    # Number of Allowed Guess on this word is 0, please get a new word
+    return false if @source.data['status'] == 400
+
+    # 这次猜测有匹配！
+    if word.count('*') < _old_asterisk_count
+      # 根据匹配的位置继续过滤 候选单词列表
+      # @return { char => [3, 5] }
+      word.chars.each_with_index do |_char, idx|
+        next if (_char == '*') || @guessed_chars.include?(_char)
+        @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+      end
+      # break # 成功后继续猜 下一个字母
+    end
+
   end
 
-  # return %W[C Z J]
-  def next_guess_chars matched_words
-    matched_words.map {|_w1| _w1.to_s.chars.to_a }.flatten.frequencies.map(&:first) - @guessed_chars
+  # return e.g. 'E'
+  def current_guess_char
+    case word.count("*")
+    # 第一步: 依据词典词频找出第一个匹配的字母及其一或多个位置
+    when word_length
+      _char = (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].keys - @guessed_chars).first
+    # 第二步: 查找剩余字母，直到找完位置
+    else
+      # 依据上面匹配字母及其位置找到所有符合单词
+      if not @matched_words
+        matched_words_array = matched_char_with_idx_in_str.map do |_char_with_idx|
+          Length_to__char_num_to_words__hash[word_length][_char_with_idx]
+        end
+        if matched_words_array.size.zero?
+          puts "no matched word" 
+          return false
+        end
+        matched_words_array.each do |_a1|
+          @matched_words ||= _a1 # init data
+          @matched_words = @matched_words & _a1
+        end
+      end
+      # 如果所有单词都不匹配
+      return false if @matched_words.size.zero?
+
+      # 并求出接下来的字母及其位置
+      # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
+      _char = select_next_vowel_or_consonant
+    end
+
+    return false if _char.nil? # 兼容无单词情况, 比如猜测词是SUNDAY，但是词典里只SUNDAE有
+
+    @guessed_chars << _char
+    return _char
   end
 
-  # return [:N2, :N6]
-  def matched_char_with_idx_in_str _result
+  # @return [:N2, :N6]
+  def matched_char_with_idx_in_str
     _a = []
-    _result.chars.each_with_index do |c1, idx|
+    word.chars.each_with_index do |c1, idx|
       _a << "#{c1}#{idx}".to_sym if c1 != '*'
     end
-    _a
+    return _a
   end
 
-  def guessing_word
-    @char_with_idx_array.sort_by {|c3| c3.to_s[1..-1].to_i }.map {|c3| c3[0] }.join
-  end
 
   # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
   # 知道找到，才切换下一个为元音。
   # 辅音同理。
   def select_next_vowel_or_consonant
-    _cs = next_guess_chars(@matched_words)
+    # avaible unguessed chars from @matched_words
+    _chars = @matched_words.map {|_w1| _w1.to_s.chars.to_a }.flatten.frequencies.map(&:first) - @guessed_chars
+
     _list = VowelList.index(@guessed_chars[-1]) ? ConsonantList : VowelList
-    _c1 = _cs.detect {|c| _list.index(c) }
-    _c1 || _cs[0] # 兼容元音数量少的情况
+    _c1 = _chars.detect {|c| _list.index(c) }
+    _c1 || _chars[0] # 兼容元音数量少的情况
   end
 
-  def guess_word range, w1 = nil
-    w1.upcase!
-    @w1_length = nil
-    @matched_chars_count = 0
-    @guessed_time = 0
-    @char_with_idx_array = []
-    @guessed_chars = []
-    @matched_words = nil
+  def guess_word
+    while (matched_chars_count != word_length) do
 
-    # 第一步: 依据词典词频找出第一个匹配的字母及其一或多个位置
-    select_guess_chars_order_by_frequency_in_range(range).each do |c1|
-      @guessed_time += 1
-      @guessed_chars << c1
-      result = match_result(w1, c1)
-      @w1_length ||= result.length
-      puts "[字频匹配] #{c1}: #{result}"
-      @matched_chars_count += (@w1_length - result.count('*'))
-      if @matched_chars_count > 0
-        @char_with_idx_array += matched_char_with_idx_in_str(result)
-        break
-      end
-    end
-
-    # 退出，比如全部都是重复字母，包括一两个字母，比如A, AA
-    return @guessed_time if @char_with_idx_array.length == @w1_length
-
-    # 依据上面匹配字母及其位置找到所有符合单词
-    matched_words_array = @char_with_idx_array.map do |_char_with_idx|
-      Length_to__char_num_to_words__hash[@w1_length][_char_with_idx]
-    end
-    if matched_words_array.size.zero?
-      puts "no matched word" 
-      return @guessed_time
-    end
-    matched_words_array.each do |_a1|
-      @matched_words ||= _a1 # init data
-      @matched_words = @matched_words & _a1
-    end
-
-    # 第二步: 查找剩余字母，直到找完位置
-    while (@matched_chars_count != @w1_length) do
-      # 如果所有单词都不匹配
-      break if @matched_words.size.zero?
-
-      # 并求出接下来的字母及其位置
-      # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
-      c1 = select_next_vowel_or_consonant
-      break if c1.nil? # 兼容无单词情况, 比如猜测词是SUNDAY，但是词典里只SUNDAE有
-
-      @guessed_chars << c1
-      @guessed_time  += 1
-      result         = match_result w1, c1
-
-      _count = (@w1_length - result.count('*'))
-      # 有匹配
-      if _count > 0
-        # 根据匹配的位置继续过滤 候选单词列表
-        # return { char => [3, 5] }
-        _char_to_idx_hash = {}
-        result.chars.each_with_index do |c2, idx|
-          _char_to_idx_hash[c2] ||= []
-          _char_to_idx_hash[c2] << idx
-        end
-        _char_to_idx_hash[c1].map do |idx|
-          Length_to__char_num_to_words__hash[@w1_length]["#{c1}#{idx}".to_sym]
-        end.each do |_words|
-          @matched_words = @matched_words & _words
-        end
-        @matched_chars_count += _count
-        @char_with_idx_array += matched_char_with_idx_in_str(result)
-        # break # 成功后继续猜 下一个字母
-      # 无匹配
-      else
-        # next
-      end
-
-      puts "[剩余单词数量#{@matched_words.count}] : [已匹配字母数量#{@matched_chars_count}] #{c1}: #{result}"
+      puts "[剩余单词数量#{@matched_words.count}] : [已匹配字母数量#{matched_chars_count}] #{c1}: #{result}"
       puts @matched_words.inspect if ENV['DEBUG']
     end
 
-    # 察看是否完全匹配
-    _w = (@w1_length > @matched_chars_count) ? "没有找到" : guessing_word
-
-    puts "猜测 次数:#{@guessed_time} 单词:#{_w} 单词长度:#{_w.length} 顺序:#{@guessed_chars}"
+    puts "猜测 次数:#{@source.guessed_time} 单词:#{word} 单词长度:#{word.length} 顺序:#{@guessed_chars}"
     puts
-    raise "猜测次数 不可能少于 单词含有的唯一字母个数" if @guessed_time < _w.chars.to_a.uniq.length
-    return @guessed_time
+    raise "猜测次数 不可能少于 单词含有的唯一字母个数" if @source.guessed_time < _w.chars.to_a.uniq.length
+    return @source.guessed_time
   end
+
+  def range; word_length..word_length end
+  def word_length; @_word_length_cache ||= word.length end
+  def matched_chars_count; word.length - word.count('*').length end
+
 end
 
 # TODO http://www.datagenetics.com/blog/april12012/index.html#result
+
+
+class Hangman
+  class << self
+    attr_reader :logger
+    @logger = Logger.new($stderr)
+  end
+end

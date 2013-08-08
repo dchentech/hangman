@@ -9,10 +9,29 @@ ws2 = File.read(File.expand_path('../../data/1000words.txt', __FILE__)).split
 
 class TestHangman < Test::Unit::TestCase
   def setup
+    @si = StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
   end
 
   def test_hangman
+    1.upto(@si.current_response['data']['numberOfWordsToGuess']) do |time|
+      @hangman = Hangman.new(@si)
+      @hangman.init_guess
+
+      while (!@hangman.done? && !@si.remain_time.zero?) do
+        @hangman.guess
+      end
+
+      @hangman.done?
+      puts "第#{time}次"
+      puts @hangman.guessed_chars.inspect
+      puts @hangman.source.inspect
+      puts
+    end
+
+    require 'pry-debugger';binding.pry
+    @si.get_test_results
   end
+
 end
 
 

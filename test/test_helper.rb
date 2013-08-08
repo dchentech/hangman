@@ -16,43 +16,62 @@ $LOAD_PATH.unshift File.dirname(__FILE__) # test dirs
 
 require 'json'
 require 'httparty'
+require 'hangman'
 
-class Remote
+
+class StrikinglyInterview
   REQUEST_URL = 'http://strikingly-interview-test.herokuapp.com/guess/process'
-  UserId = "moc.liamg@emojvm".reverse
+
+  attr_reader :secret, :current_response
+
+  def initialize userId
+    @user_id = userId
+
+    # 1. Initite Game
+    @current_response = request.parsed_response
+    @secret ||= @current_response['secret']
+
+    return self
+  end
+
+  # 2. Give Me A Word
+  def give_me_a_word
+    @current_response = request(:action => "nextWord")
+  end
+
+  # 3. Make A Guess
+  def make_a_guess char
+    @current_response = request(:action => 'guessWord', :guess => char)
+  end
+  # @r.parsed_response['data'] # => {"numberOfWordsTried"=>1, "numberOfGuessAllowedForThisWord"=>10}
+  # @r.parsed_response['word']
+
+  # 4. Get Test Results
+  def get_test_results
+    # TODO
+  end
+
+  while @r.parsed_response['data']['numberOfWordsTried'] <= @r.parsed_response['data']['numberOfGuessAllowedForThisWord'] do
+  end if nil
+
+  def word; current_response['word'] end
+  def guessed_time; data['numberOfWordsTried']; end
+  def remain_time; data['numberOfGuessAllowedForThisWord']; end
+  def data; @current_response['data']; end
 
   def request data = {}
     HTTParty.post(REQUEST_URL, {
       :headers => {"Content-Type" => "application/json"},
       :body => ({
         :action  => "initiateGame",
-        :userId  => UserId,
-        :secret => ENV['SECRET']
+        :userId  => @user_id,
+        :secret => @secret
       }).merge(data).to_json
     })
   end
 
-  # 1. Initite Game
-  ENV['SECRET'] = request.parsed_response['secret']
-
-  # 2. Give Me A Word
-  @r = request(:action => "nextWord")
-
-  # 3. Make A Guess
-  @r.parsed_response['data'] # => {"numberOfWordsTried"=>1, "numberOfGuessAllowedForThisWord"=>10}
-
-  # return "**N***N"
-  def match_result w, c
-    w.chars.map {|c1| (c == c1) ? c : '*' }.join
-  end
-
-  while @r.parsed_response['data']['numberOfWordsTried'] <= @r.parsed_response['data']['numberOfGuessAllowedForThisWord'] do
-    @r = request(:action => 'guessWord', :guess => '')
-  end
 end
 
 # TODO write word to file
 
-
-
-#  `curl -X POST -H "Content-Type: application/json" -d '{"action":"initiateGame","userId":"mvjome@gmail.com"}' #{REQUEST_URL}`
+#  `curl -X POST -H "Content-Type: application/json" -d '{"action":"initiateGame","userId":""}' #{REQUEST_URL}`

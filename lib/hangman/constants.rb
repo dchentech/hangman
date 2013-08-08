@@ -1,7 +1,9 @@
 # encoding: UTF-8
 
 class Hangman
-  PopularityOfLettersData = <<-EOF
+  # popularity of letters in dictionary words grouped by the length of those words
+  # copied from http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
+PopularityOfLettersData = <<-EOF
     1 2 3	4	5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20
 #1	A	A	A	A	S	E	E	E	E E   E   E   I   I   I   I   I   I   I   I
 #2	I	O	E	E	E	S	S	S	S I   I   I   E   E   E   E   E   S   E   O
@@ -46,7 +48,7 @@ EOF
   # 获取单词列表
   # http://nifty.stanford.edu/2011/schwarz-evil-hangman/dictionary.txt
   # 里面已包含 Plural, Tenses Adjectives
-  words = (File.read(File.expand_path('../../data/words.txt', __FILE__)).split("\n") + %w[a i]).map(&:upcase)
+  words = (File.read(File.expand_path('../../../data/words.txt', __FILE__)).split("\n") + %w[a i]).map(&:upcase)
 
   # 建立有位置信息的字母 映射到 单词 的哈希表
   # {len => { :char_pos => words } }
