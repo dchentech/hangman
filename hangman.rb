@@ -53,6 +53,8 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # http://en.wikipedia.org/wiki/Hangman_(game)
 # http://zh.wikipedia.org/wiki/字母频率
 # https://github.com/fredley/pyngman/blob/master/pyngman.py
+# https://docs.google.com/document/d/18s9i0SKThDasIAb3WgTxxSkz2QEjAT9sVyJFQXMpB1I/edit 七种武器：从一个算法的多语言实现看编程语言的横向对比
+# 
 
 
 # popularity of letters in dictionary words grouped by the length of those words
@@ -185,7 +187,7 @@ def guess_word range, w1 = nil
   @guessed_chars = []
   @matched_words = nil
 
-  # 第一步: 找出第一个匹配的字母及其一或多个位置
+  # 第一步: 依据词典词频找出第一个匹配的字母及其一或多个位置
   select_guess_chars_order_by_frequency_in_range(range).each do |c1|
     @guessed_time += 1
     @guessed_chars << c1
@@ -270,7 +272,7 @@ ws2 = %w[affability kinglinesses papeteries bro ironer kyboshed hoodie settlors 
 
 if true
 _guess_counts_array = []
-ws = ws2
+ws = ws2.shuffle[0..79]
 ws.each do |w|
   _guess_counts_array << guess_word(1..13, w)
 end
@@ -282,13 +284,22 @@ puts "*"*30
 end
 
 # 别人结果有: AVG: 7.782 NUM: 1000 TOTAL: 7782。不过可疑的是 OUTRANKS = 6，猜测次数少于唯一字母数。
-# 2013-08-08 14:23
-# GUESS_AVG:11.0, GUESS_TOTAL:11927. WORD_NUM:1001, CHARS_COUNT_AVG:9.
-# 2013-08-08 14:33 去掉U之后
-# GUESS_AVG:11.0, GUESS_TOTAL:11896. WORD_NUM:1001, CHARS_COUNT_AVG:9.
-# 2013-08-08 15:29 加上中位数。AVG小于MEDIAN，说明经过一定优化了。
-# GUESS_AVG:11.0, GUESS_TOTAL:11896, GUESS_COUNT_MEDIAN:12.0
-# WORD_NUM:1001, CHARS_COUNT_AVG:9, CHARS_COUNT_MEDIAN:9.0
+# [2013-08-08 14:23]
+#   GUESS_AVG:11.0, GUESS_TOTAL:11927. WORD_NUM:1001, CHARS_COUNT_AVG:9.
+# [2013-08-08 14:33] 去掉U之后
+#   GUESS_AVG:11.0, GUESS_TOTAL:11896. WORD_NUM:1001, CHARS_COUNT_AVG:9.
+# [2013-08-08 15:29] 加上中位数。AVG小于MEDIAN，说明经过一定优化了。
+#   GUESS_AVG:11.0, GUESS_TOTAL:11896, GUESS_COUNT_MEDIAN:12.0
+#   WORD_NUM:1001, CHARS_COUNT_AVG:9, CHARS_COUNT_MEDIAN:9.0
+# [2013-08-08 15:40] 随机抽80个
+#   GUESS_AVG:12.0, GUESS_TOTAL:975, GUESS_COUNT_MEDIAN:12.0
+#   WORD_NUM:80, CHARS_COUNT_AVG:9, CHARS_COUNT_MEDIAN:9.0
+# [2013-08-08 15:42] 随机抽80个
+#   GUESS_AVG:12.0, GUESS_TOTAL:963, GUESS_COUNT_MEDIAN:12.0
+#   WORD_NUM:80, CHARS_COUNT_AVG:8, CHARS_COUNT_MEDIAN:8.0
+# [2013-08-08 15:43] 随机抽80个
+#   GUESS_AVG:12.0, GUESS_TOTAL:984, GUESS_COUNT_MEDIAN:12.0
+#   WORD_NUM:80, CHARS_COUNT_AVG:8, CHARS_COUNT_MEDIAN:8.0
 
 def gw word
   l = word.length
