@@ -2,11 +2,21 @@
 
 require File.expand_path('../test_helper.rb', __FILE__)
 
-ws2 = File.read(File.expand_path('../../data/1000words.txt', __FILE__)).split
-
 ws1 = %w[COMAKER CUMULATE ERUPTIVE FACTUAL MONADISM MUS NAGGING OSES REMEMBERED SPODUMENES STEREOISOMERS TOXICS TRICHROMATS TRIOSE UNIFORMED]
 
-if true
+ws2 = File.read(File.expand_path('../../data/1000words.txt', __FILE__)).split
+
+
+class TestHangman < Test::Unit::TestCase
+  def setup
+  end
+
+  def test_hangman
+  end
+end
+
+
+if false
 _guess_counts_array = []
 ws = ws2 #.shuffle[0..79]
 ws = ws2.select {|w| w.length < 6 }
@@ -41,6 +51,3 @@ end
 # [2013-08-08 16:35] 单词长度等于10
 #   GUESS_AVG:11.0, GUESS_TOTAL:1366, GUESS_COUNT_MEDIAN:11.0
 #   WORD_NUM:119, CHARS_COUNT_AVG:10, CHARS_COUNT_MEDIAN:10.0
-
-
-
