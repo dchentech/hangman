@@ -40,7 +40,13 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 =end
 
 # 核心思想是贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
-# 最笨的次数是猜20次以上，优化的应该是13以下。
+#
+#
+# 复杂度估计
+# a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
+# b. 最少是该单词唯一字母的个数，所以一般来说底线是单词长度。
+#
+# 步骤
 # 1
 # 第一个猜的字母用统计数据的词频，返回可能部分被*掩盖的单词，
 # 1.1 如果是A或I，判断就终止了;
@@ -54,6 +60,9 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # 2.2
 # 如果是两个以上字母，那么剩余的字母频度就从这个过滤好的单词列表里继续抽取了，
 # 如此反复，直到最终找到那个单词为止。
+#
+#
+#
 
 
 # popularity of letters in dictionary words grouped by the length of those words
