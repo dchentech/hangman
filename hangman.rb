@@ -101,9 +101,8 @@ ConsonantList = ('A'..'Z').to_a - VowelList + %w[U]
 
 # 获取单词列表
 # http://nifty.stanford.edu/2011/schwarz-evil-hangman/dictionary.txt
+# 里面已包含 Plural, Tenses Adjectives
 words = (File.read("/Users/mvj3/github/joycehan/strikingly-interview-test-instructions/data/words.txt").split("\n") + %w[a i]).map(&:upcase)
-# TODO 复词等类型, activesupport
-
 
 # 建立有位置信息的字母 映射到 单词 的哈希表
 # {len => { :char_pos => words } }
@@ -243,6 +242,7 @@ def guess_word range, w1 = nil
     end
 
     puts "[剩余单词数量#{@matched_words.count}] : [已匹配字母数量#{@matched_chars_count}] #{c1}: #{result}"
+    puts @matched_words.inspect if ENV['DEBUG']
   end
 
   # 察看是否完全匹配
