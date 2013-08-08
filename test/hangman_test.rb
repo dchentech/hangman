@@ -13,6 +13,8 @@ class TestHangman < Test::Unit::TestCase
   end
 
   def test_hangman
+    require 'pry-debugger'; binding.pry
+
     1.upto(@si.current_response['data']['numberOfWordsToGuess']) do |time|
       @hangman = Hangman.new(@si)
       @hangman.init_guess
@@ -22,13 +24,13 @@ class TestHangman < Test::Unit::TestCase
       end
 
       @hangman.done?
-      puts "第#{time}次"
+      puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"
       puts @hangman.guessed_chars.inspect
       puts @hangman.source.inspect
       puts
+      Hangman.word_recorder.info @hangman.word if @hangman.done?
     end
 
-    require 'pry-debugger';binding.pry
     @si.get_test_results
   end
 

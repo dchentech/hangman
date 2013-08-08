@@ -138,8 +138,7 @@ end
 
 
 class Hangman
-  class << self
-    attr_reader :logger
-    @logger = Logger.new($stderr)
+  def self.word_recorder
+    @@word_recorder ||= Logger.new(File.expand_path("../../strikingly_words.txt", __FILE__))
   end
 end
