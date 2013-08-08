@@ -20,7 +20,9 @@ class TestHangman < Test::Unit::TestCase
       puts "该单词长度为#{@si.word.size}， 可以猜#{@si.remain_time} 次。"
       while (!@hangman.done? && !@si.remain_time.zero?) do
         @hangman.guess
+        print '.'
       end
+      print "\n"
 
       @hangman.done?
       puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"

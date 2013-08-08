@@ -3,6 +3,7 @@
 require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
+# TODO log words and their unmatched words to database
 
 class Hangman
   attr_reader :source
@@ -25,7 +26,7 @@ class Hangman
   # delegate behaviors to @source
   def success?; @source.success?  end
   def word; @source.word end
-  def done?; word.count('*').zero? end
+  def done?; word && word.count('*').zero? end
   def init_guess; @source.give_me_a_word end
 
   def guess
@@ -37,20 +38,25 @@ class Hangman
     _old_asterisk_count = word.count('*')
 
     #require 'pry-debugger'; binding.pry
-    @source.make_a_guess current_guess_char
+    _current_guess_char = current_guess_char
+    @source.make_a_guess _current_guess_char
 
     # Number of Allowed Guess on this word is 0, please get a new word
     return false if @source.status == 400
 
-    # 这次猜测有匹配！
-    # require 'pry-debugger'; binding.pry
     begin
-    if success? && (word.count('*') < _old_asterisk_count)
-      # 根据匹配的位置继续过滤 候选单词列表
-      # @return { char => [3, 5] }
-      word.chars.each_with_index do |_char, idx|
-        next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
-        @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+    if success? && @matched_words # compactible with herokuapp error
+      # 这次猜测有匹配！
+      if word.count('*') < _old_asterisk_count
+        # 根据匹配的位置继续过滤 候选单词列表
+        # @return { char => [3, 5] }
+        word.chars.each_with_index do |_char, idx|
+          next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
+          @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+        end
+      else
+        # reject no match words
+        @matched_words = @matched_words.reject {|w| w.to_s.match(_current_guess_char) }
       end
       # break # 成功后继续猜 下一个字母
     end
