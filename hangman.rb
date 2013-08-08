@@ -19,7 +19,6 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 
 # 核心思想是贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
 #
-#
 # 复杂度估计
 # a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
 # b. 最少是该单词唯一字母的个数，所以一般来说底线是单词长度。
@@ -44,11 +43,16 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # 1. 使用Symbol节省内存
 # 2. 使用Hash O(1) 查找
 #
+# 猜词策略，元音和辅音间隔猜。
+#
+#
 # 作为一个程序员，我先是选择算法和其他现成做法
 # https://github.com/spydez/hangman hanman solver program for job interview
 # http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
 # http://www.learnstreet.com/cg/simple/project/hangman-ruby
 # http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
+# http://en.wikipedia.org/wiki/Hangman_(game)
+# http://zh.wikipedia.org/wiki/字母频率
 # https://github.com/fredley/pyngman/blob/master/pyngman.py
 
 
@@ -91,9 +95,14 @@ PopularityOfLettersInLength = data_lines[0].inject({}) do |h, idx|
   h
 end
 
+VowelList = %w[A E I O U]
+ConsonantList = ('A'..'Z').to_a - VowelList
+
 # 获取单词列表
 # http://nifty.stanford.edu/2011/schwarz-evil-hangman/dictionary.txt
 words = (File.read("/Users/mvj3/github/joycehan/strikingly-interview-test-instructions/data/words.txt").split("\n") + %w[a i]).map(&:upcase)
+# TODO 复词等类型, activesupport
+
 
 # 建立有位置信息的字母 映射到 单词 的哈希表
 # {len => { :char_pos => words } }
@@ -136,13 +145,24 @@ def next_guess_chars matched_words
   matched_words.map {|_w1| _w1.to_s.chars.to_a }.flatten.frequencies.map(&:first) - @guessed_chars
 end
 
-# return [:n2, :n6]
+# return [:N2, :N6]
 def matched_char_with_idx_in_str _result
   _a = []
   _result.chars.each_with_index do |c1, idx|
     _a << "#{c1}#{idx}".to_sym if c1 != '*'
   end
   _a
+end
+
+# 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
+# 知道找到，才切换下一个为元音。
+# 辅音同理。
+def select_next_vowel_or_consonant
+  # require 'pry-debugger';binding.pry
+  _cs = next_guess_chars(@matched_words)
+  _list = VowelList.index(@guessed_chars[-1]) ? ConsonantList : VowelList
+  _c1 = _cs.detect {|c| _list.index(c) }
+  _c1 || _cs[0] # 兼容元音数量少的情况
 end
 
 def guess_word range, w1 = nil
@@ -154,7 +174,7 @@ def guess_word range, w1 = nil
   @guessed_chars = []
   @matched_words = nil
 
-  # 找出第一个匹配的字母及其一或多个位置
+  # 第一步: 找出第一个匹配的字母及其一或多个位置
   select_guess_chars_order_by_frequency_in_range(range).each do |c1|
     @guessed_time += 1
     @guessed_chars << c1
@@ -184,44 +204,48 @@ def guess_word range, w1 = nil
     @matched_words = @matched_words & _a1
   end
 
-  # 查找剩余字母，直到找完位置
+  # 第二步: 查找剩余字母，直到找完位置
   while (@matched_chars_count != @w1_length) do
     # 如果所有单词都不匹配
     break if @matched_words.size.zero?
 
     # 并求出接下来的字母及其位置
     # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
-    next_guess_chars(@matched_words).each do |c1|
-      @guessed_chars << c1
-      @guessed_time  += 1
-      result         = match_result w1, c1
-      puts "[剩余单词数量#{@matched_words.count}] #{c1}: #{result}"
+    c1 = select_next_vowel_or_consonant
 
-      _count = (@w1_length - result.count('*'))
-      if _count > 0 # 有匹配
-        # 根据匹配的位置继续过滤 候选单词列表
-        # return { char => [3, 5] }
-        _char_to_idx_hash = {}
-        result.chars.each_with_index do |c2, idx|
-          _char_to_idx_hash[c2] ||= []
-          _char_to_idx_hash[c2] << idx
-        end
-        _char_to_idx_hash[c1].map do |idx|
-          Length_to__char_num_to_words__hash[@w1_length]["#{c1}#{idx}".to_sym]
-        end.each do |_words|
-          @matched_words = @matched_words & _words
-        end
-        @matched_chars_count += _count
-        @char_with_idx_array += matched_char_with_idx_in_str(result)
-        break # 成功后继续猜 下一个字母
-      else # 无匹配
-        next
+    @guessed_chars << c1
+    @guessed_time  += 1
+    result         = match_result w1, c1
+
+    _count = (@w1_length - result.count('*'))
+    # 有匹配
+    if _count > 0
+      # 根据匹配的位置继续过滤 候选单词列表
+      # return { char => [3, 5] }
+      _char_to_idx_hash = {}
+      result.chars.each_with_index do |c2, idx|
+        _char_to_idx_hash[c2] ||= []
+        _char_to_idx_hash[c2] << idx
       end
+      _char_to_idx_hash[c1].map do |idx|
+        Length_to__char_num_to_words__hash[@w1_length]["#{c1}#{idx}".to_sym]
+      end.each do |_words|
+        @matched_words = @matched_words & _words
+      end
+      @matched_chars_count += _count
+      @char_with_idx_array += matched_char_with_idx_in_str(result)
+      # break # 成功后继续猜 下一个字母
+    # 无匹配
+    else
+      # next
     end
+    puts "[剩余单词数量#{@matched_words.count}] : [已匹配字母数量#{@matched_chars_count}] #{c1}: #{result}"
+    puts "@w1_length:#{@w1_length}, c1:#{c1}"
   end
 
   _w = @char_with_idx_array.sort_by {|c3| c3.to_s[1..-1].to_i }.map {|c3| c3[0] }.join
   puts "猜测 次数:#{@guessed_time} 单词:#{_w} 单词长度:#{_w.length} 顺序:#{@guessed_chars}"
+  puts
   raise "猜测次数 不可能少于 单词含有的唯一字母个数" if @guessed_time < _w.chars.to_a.uniq.length
   return @guessed_time
 end
