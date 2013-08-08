@@ -1,15 +1,15 @@
-What is hangman?
+Hangman
 ===============================
 In its purest form, hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
 
-需求
+Requirement
 -------------------------------
 Types of Words
 Plural
 Tenses
 Adjectives
 Difficulty of Words
-Among the 80 words to guess, there will be in different lengths # 使用这里的表格
+Among the 80 words to guess, there will be in different lengths
 1st to 20th word : length <= 5 characters
 21st to 40th word : length <= 8 characters
 41st to 60th word : length <= 12 characters
@@ -68,4 +68,5 @@ https://github.com/fredley/pyngman/blob/master/pyngman.py
 https://docs.google.com/document/d/18s9i0SKThDasIAb3WgTxxSkz2QEjAT9sVyJFQXMpB1I/edit 七种武器：从一个算法的多语言实现看编程语言的横向对比
 http://stackoverflow.com/questions/16223305/algorithm-for-classifying-words-for-hangman-difficulty-levels-as-easy-medium
 https://github.com/freizl/play-hangman-game/
+
 
