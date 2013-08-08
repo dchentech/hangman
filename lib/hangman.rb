@@ -4,6 +4,8 @@ require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
 # TODO log words and their unmatched words to database
+# TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
+# TODO 并发测试，网络速度太慢
 
 class Hangman
   attr_reader :source
@@ -61,7 +63,7 @@ class Hangman
       # break # 成功后继续猜 下一个字母
     end
     rescue => e
-      e; require 'pry-debugger'; binding.pry
+      e.id; require 'pry-debugger'; binding.pry
     end
 
   end
