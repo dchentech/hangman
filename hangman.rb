@@ -1,31 +1,9 @@
 # encoding: UTF-8
 
-# NO try 'e' first
 # `curl -k -X POST -d 'name=hello1' --user your@email.com:password https://api.bitbucket.org/1.0/repositories -v`
 # `curl -X POST -H "Content-Type: application/json" -d '{"username":"xyz","password":"xyz"}' http://localhost:3000/api/login`
 
-
-
-# https://github.com/spydez/hangman hanman solver program for job interview
-# http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
-# http://www.learnstreet.com/cg/simple/project/hangman-ruby
-# http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
-# https://github.com/fredley/pyngman/blob/master/pyngman.py
-
-
-
-# 1. 作为一个程序员，我先是选择算法和其他现成做法
-# 2. 
-#
-# in C
-
-# 1. 使用Symbol节省内存
-# 2. 优化原则是计算字母可能性
-
-# a. 依次试(most frequent character in the range) => match words with length
-# b. select match words in the same length, 
-# c. 选出里面最常见的字母, 依次试
-
+# 需求
 =begin
 Types of Words
 Plural
@@ -53,7 +31,8 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # 1.2 如果全是*，继续字母频度的下一个;
 # 1.3 如果不全是*，那么进入第二步
 # 2
-# 第二个猜的字母根据刚才含有位置信息的字母去找到字典索引找到全部匹配的单词列表，
+# 在第一步里我们知道了单词的长度，
+# 那么第二个猜的字母根据刚才含有位置信息的字母去找到字典索引找到全部匹配的单词列表，
 # 并统计其中字母频度，并按该结果取出第二个字母（第一个我们刚才用掉了嘛），
 # 并一直直到确认第二个字母匹配。
 # 2.1 如果这个单词只有两个字母，那么到这里就结束了,
@@ -61,8 +40,16 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 # 如果是两个以上字母，那么剩余的字母频度就从这个过滤好的单词列表里继续抽取了，
 # 如此反复，直到最终找到那个单词为止。
 #
+# Ruby程序优化原则
+# 1. 使用Symbol节省内存
+# 2. 使用Hash O(1) 查找
 #
-#
+# 作为一个程序员，我先是选择算法和其他现成做法
+# https://github.com/spydez/hangman hanman solver program for job interview
+# http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
+# http://www.learnstreet.com/cg/simple/project/hangman-ruby
+# http://www.datagenetics.com/blog/april12012/index.html 统计学意义上
+# https://github.com/fredley/pyngman/blob/master/pyngman.py
 
 
 # popularity of letters in dictionary words grouped by the length of those words
