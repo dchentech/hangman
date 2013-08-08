@@ -8,15 +8,11 @@ class Hangman
   attr_reader :source
   attr_reader :guessed_chars, :matched_words
 
-  attr_reader :logger
-
   def initialize source
     @source = source
 
-    @logger = Logger.new($stdout)
-
     # check @source's methods
-    [:word, :make_a_guess, :give_me_a_word].each do |m|
+    [:word, :make_a_guess, :give_me_a_word, :status].each do |m|
       raise "#{@source}'s class #{@source.class} havent defined method :#{m}" if not @source.methods.include? m
     end
 
@@ -35,24 +31,30 @@ class Hangman
     raise "Please #init_guess first" if word.nil?
 
     # 退出，比如全部都是重复字母，包括一两个字母，比如A, AA
-    return false if matched_char_with_idx_in_str.length == word_length
+    return false if matched_chars_with_idx.length == word_length
 
     _old_asterisk_count = word.count('*')
 
+    #require 'pry-debugger'; binding.pry
     @source.make_a_guess current_guess_char
 
     # Number of Allowed Guess on this word is 0, please get a new word
-    return false if @source.data['status'] == 400
+    return false if @source.status == 400
 
     # 这次猜测有匹配！
+    # require 'pry-debugger'; binding.pry
+    begin
     if word.count('*') < _old_asterisk_count
       # 根据匹配的位置继续过滤 候选单词列表
       # @return { char => [3, 5] }
       word.chars.each_with_index do |_char, idx|
-        next if (_char == '*') || @guessed_chars.include?(_char)
+        next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
         @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
       end
       # break # 成功后继续猜 下一个字母
+    end
+    rescue => e
+      e; require 'pry-debugger'; binding.pry
     end
 
   end
@@ -66,35 +68,37 @@ class Hangman
     # 第二步: 查找剩余字母，直到找完位置
     else
       # 依据上面匹配字母及其位置找到所有符合单词
+    # require 'pry-debugger'; binding.pry
       if not @matched_words
-        matched_words_array = matched_char_with_idx_in_str.map do |_char_with_idx|
+        matched_words_array = matched_chars_with_idx.map do |_char_with_idx|
           Length_to__char_num_to_words__hash[word_length][_char_with_idx]
         end
         if matched_words_array.size.zero?
           puts "no matched word" 
-          return false
+          return nil
         end
         matched_words_array.each do |_a1|
-          @matched_words ||= _a1 # init data
+          @matched_words ||= _a1
           @matched_words = @matched_words & _a1
         end
       end
       # 如果所有单词都不匹配
-      return false if @matched_words.size.zero?
+      return nil if @matched_words.size.zero?
 
       # 并求出接下来的字母及其位置
       # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
       _char = select_next_vowel_or_consonant
     end
 
-    return false if _char.nil? # 兼容无单词情况, 比如猜测词是SUNDAY，但是词典里只SUNDAE有
+    return nil if _char.nil? # 兼容无单词情况, 比如猜测词是SUNDAY，但是词典里只SUNDAE有
 
     @guessed_chars << _char
+
     return _char
   end
 
   # @return [:N2, :N6]
-  def matched_char_with_idx_in_str
+  def matched_chars_with_idx
     _a = []
     word.chars.each_with_index do |c1, idx|
       _a << "#{c1}#{idx}".to_sym if c1 != '*'

@@ -13,19 +13,20 @@ class TestHangman < Test::Unit::TestCase
   end
 
   def test_hangman
-    1.upto(@si.current_response['data']['numberOfWordsToGuess']) do |time|
+    1.upto(@si.data['numberOfWordsToGuess']) do |time|
       @hangman = Hangman.new(@si)
       @hangman.init_guess
 
+      puts "该单词长度为#{@si.word.count}， 可以猜#{@si.remain_time} 次。"
       while (!@hangman.done? && !@si.remain_time.zero?) do
         @hangman.guess
       end
 
       @hangman.done?
       puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"
-      puts "依次猜过的字母 #{@hangman.guessed_chars.inspect}"
+      puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
-      puts "还没猜完的单词 #{@hangman.matched_words.inspect}"
+      puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
       puts
       Hangman.word_recorder.info @hangman.word if @hangman.done?
     end
