@@ -39,6 +39,19 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 61st to 80th word : length > 12 characters
 =end
 
+# 核心思想是贪婪算法，让猜测步骤尽可能少。
+# 1
+# 第一个猜的字母用统计数据的词频，返回可能部分被*掩盖的单词，
+# 1.1 如果是A或I，判断就终止了;
+# 2.2 如果全是*，继续字母频度的下一个;
+# 2.3 如果不全是*，那么进入第二步
+# 第二个猜的字母根据刚才含有位置信息的字母去找到字典索引找到全部匹配的单词列表，
+# 并统计其中字母频度，并按该结果取出第二个字母（第一个我们刚才用掉了嘛），
+# 并一直直到确认第二个字母匹配。
+# 2.1 如果这个单词只有两个字母，那么到这里就结束了,
+# 2.2
+# 如果是两个以上字母，那么剩余的字母频度就从这个过滤好的单词列表里继续抽取了，
+# 如此反复，直到最终找到那个单词为止。
 
 
 # popularity of letters in dictionary words grouped by the length of those words
@@ -108,19 +121,12 @@ def select_first_guess_character_in_range range
   (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].first || {})[0]
 end
 
+# return "**N***N"
 def match_result w, c
   w.chars.map {|c1| (c == c1) ? c : '*' }.join
 end
 
-# 依据上面匹配字母及其位置找到所有符合单词，
-# 并求出接下来的字母及其位置
-def char_with_idx__to__rest _char_with_idx_array, _word_length, _guessed_chars
-  _rest_matched_chars_order_by_count = _char_with_idx_array.map do |_char_with_idx|
-    Length_to__char_num_to_words__hash[_word_length][_char_with_idx]
-  end.flatten.uniq.map(&:to_s).join.chars.frequencies.map(&:first)
-  _rest_matched_chars_order_by_count -= _guessed_chars
-end
-
+# return [:n2, :n6]
 def matched_char_with_idx_in_str _result
   _a = []
   _result.chars.each_with_index do |c1, idx|
@@ -129,14 +135,17 @@ def matched_char_with_idx_in_str _result
   _a
 end
 
+def 
+
 def guess_word range, w1
   w1.upcase!
   w1_length = w1.length
-  match_count = 0
+  matched_chars_count = 0
   guess_time = 0
   result = nil
   char_with_idx_array = []
   guessed_chars = []
+  next_guess_chars = nil
 
   # 找出第一个匹配的字母及其一或多个位置
   PopularityOfLettersInLength[w1_length].each do |c1|
@@ -144,8 +153,8 @@ def guess_word range, w1
     guessed_chars << c1
     result = match_result(w1, c1)
     puts "#{c1}: #{result}"
-    match_count += (w1_length - result.count('*'))
-    if match_count > 0
+    matched_chars_count += (w1_length - result.count('*'))
+    if matched_chars_count > 0
       char_with_idx_array += matched_char_with_idx_in_str(result)
       break
     end
@@ -154,25 +163,47 @@ def guess_word range, w1
   # 退出，比如只有一两个字母
   return guess_time if char_with_idx_array.length == w1_length
 
+  # 依据上面匹配字母及其位置找到所有符合单词，
+  # 并求出接下来的字母及其位置
+  matched_words_array = _char_with_idx_array.map do |_char_with_idx|
+    Length_to__char_num_to_words__hash[_word_length][_char_with_idx]
+  end
+  if matched_words_array.size.zero?
+    puts "no matched word" 
+    return guess_time
+  end
+  matched_words = nil
+  matched_words_array.each do |_a1|
+    if matched_words.nil? # init data
+      matched_words = _a1
+    else
+      matched_words = matched_words & _a1
+    end
+  end
+  next_guess_chars = matched_words.map {|_w1| _w1.to_s.chars }.flatten.frequencies.map(&:first)
+  next_guess_chars = next_guess_chars - guessed_chars
+
   # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
-  while (match_count != w1_length) do
-    char_with_idx__to__rest(char_with_idx_array, w1_length, guessed_chars).each do |c1|
+  while (matched_chars_count != w1_length) do
+    next_guess_chars.each do |c1|
       guess_time += 1
       result = match_result w1, c1
       puts "#{c1}: #{result}"
       _count = (w1_length - result.count('*'))
-      match_count += _count
-      char_with_idx_array += matched_char_with_idx_in_str(result)
+      matched_chars_count += _count
       guessed_chars << c1
       break if _count > 0
     end
   end
 
   puts guess_time
-  guess_time
+  return guess_time
 end
+# TODO puts matched length words count in each step
 
-guess_word 1..8, "COMAKER"
+%w[COMAKER CUMULATE ERUPTIVE FACTUAL MONADISM MUS NAGGING OSES REMEMBERED SPODUMENES STEREOISOMERS TOXICS TRICHROMATS TRIOSE UNIFORMED].each do |w|
+  guess_word 1..13, w
+end
 
 
 # 开始猜测单词
@@ -182,6 +213,9 @@ guess_word 1..8, "COMAKER"
   20.times do |idx|
   end
 end if nil
+
+
+
 
 __END__
 irb(main):497:0> guess_word 1..8, "COMAKER"
