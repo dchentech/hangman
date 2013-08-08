@@ -40,6 +40,7 @@ Among the 80 words to guess, there will be in different lengths # 使用这里�
 =end
 
 # 核心思想是贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
+# 最笨的次数是猜20次以上，优化的应该是13以下。
 # 1
 # 第一个猜的字母用统计数据的词频，返回可能部分被*掩盖的单词，
 # 1.1 如果是A或I，判断就终止了;
@@ -104,7 +105,10 @@ words = (File.read("/Users/mvj3/github/joycehan/strikingly-interview-test-instru
 # TODO 其他数据结构，但这个只能提高查找效率，不能减少猜字母的次数。
 # {:len_char_pos => words }
 # {:len => {char => { pos => words } } }
+_h = Hash.new { 0 }
 Length_to__char_num_to_words__hash = words.inject({}) do |h, w|
+  _h[w.length] += 1
+
   h[w.length] ||= {}
   w.chars.each_with_index do |c, c_idx|
     _sym = "#{c}#{c_idx}".to_sym
@@ -113,7 +117,7 @@ Length_to__char_num_to_words__hash = words.inject({}) do |h, w|
   end
   h
 end
-
+Length_to__words_count_hash = _h
 Length_to__char_num_to_words__hash.keys
 
 module Enumerable
@@ -133,7 +137,7 @@ end
 
 # return %W[C Z J]
 def next_guess_chars matched_words
-  matched_words.map {|_w1| _w1.to_s.chars }.flatten.frequencies.map(&:first) - @guessed_chars
+  matched_words.map {|_w1| _w1.to_s.chars.to_a }.flatten.frequencies.map(&:first) - @guessed_chars
 end
 
 # return [:n2, :n6]
@@ -145,9 +149,7 @@ def matched_char_with_idx_in_str _result
   _a
 end
 
-def 
-
-def guess_word range, w1
+def guess_word range, w1 = nil
   w1.upcase!
   @w1_length = nil
   @matched_chars_count = 0
@@ -189,14 +191,14 @@ def guess_word range, w1
   # 查找剩余字母，直到找完位置
   while (@matched_chars_count != @w1_length) do
     # 如果所有单词都不匹配
-    break if @matched_words.blank?
+    break if @matched_words.size.zero?
 
     # 并求出接下来的字母及其位置
     # 当找到一个匹配后，就重新选择下一个最大机会匹配字母
     next_guess_chars(@matched_words).each do |c1|
       @guessed_time += 1
       result = match_result w1, c1
-      puts "#{c1}: #{result}"
+      puts "[剩余单词数量#{@matched_words.count}] #{c1}: #{result}"
 
       _count = (@w1_length - result.count('*'))
       if _count > 0 # 有匹配
@@ -213,6 +215,7 @@ def guess_word range, w1
         end
         @matched_chars_count += _count
         @guessed_chars << c1
+        @char_with_idx_array += matched_char_with_idx_in_str(result)
         break # 成功后继续猜 下一个字母
       else # 无匹配
         next
@@ -220,15 +223,21 @@ def guess_word range, w1
     end
   end
 
-  puts @guessed_time
+  _w = @char_with_idx_array.sort_by {|c3| c3.to_s[1..-1].to_i }.map {|c3| c3[0] }.join
+  puts "猜测 次数:#{@guessed_time} 单词:#{_w} 单词长度:#{_w.length} 顺序:#{@guessed_chars}"
   return @guessed_time
 end
-# TODO puts matched length words count in each step
 
 %w[COMAKER CUMULATE ERUPTIVE FACTUAL MONADISM MUS NAGGING OSES REMEMBERED SPODUMENES STEREOISOMERS TOXICS TRICHROMATS TRIOSE UNIFORMED].each do |w|
   guess_word 1..13, w
 end
+guess_word 1..13, 'UNIFORMED'
+def gw word
+  l = word.length
+  guess_word l..l, word
+end
 
+%w[affability kinglinesses papeteries bro ironer kyboshed hoodie settlors stonefish feloniousnesses butyrophenone ensile impartment penalty belatednesses overchilled veery ridglings globe amortised matzohs nonelective jacqueries narratological cacophonous catheterization outdared harpsichordist guttered dekes salutations iterate hegumen transshapes spearmints committals text connecting inkjet minestrones waveform pyrophyllites bullrings unbridling asphyxies partyers judgmatically shirtsleeve ascetically dirl enlightening douma pinkoes sightlessness moulding swingby waveshape intercessional tusses field yeshiva explorational rigour fictivenesses gusto ahoy schmelze whooshed yellower athetoid ordeal monoxide peacockish deadbeat anecdote uncoalesced hackmatack offishness almsgivings effervescence gravel renovative desertifications bamming toepieces gluttonously crams overmedicates commonsense birthdates desorbed psst retrogradation sphygmomanometer barouche unharness correlational martyrologies winglet heptarch spectroscopies oversensitivities immunofluorescence totalities thimbleberry penates slipup oughted oedema preening meropic redialing hyperparathyroidisms flicked buttocks readout whitewashes arioso appeasements preventers snarkier pratfalls surbased excogitative idolators disaccharides rebuy establisher embays extorting apocalyptist emetics microdissection misalters mortalities fuglemen symposiums host prelims sizeable titivated agrarianisms microinjected strobes soymilks scrawnier tapir blowouts overdrink counterviolences cranky bombyx neurophysiology uprightness clownishly guitarfish rump hardset quietened cockiness roquelaures osmoregulatory rune dotardly medallion advertized labored lineality springers counterespionages substratum gauffered summered inevitably dewy outweighing antistrophe denunciative chimbley speculums perniciousnesses tenacities outmaneuvering gimped yardwands hospices electrodesiccations palliates weighmen decentre plasterings smirk exuberating sedulity mild becrawl relit stumble rugose resistants professedly flemishing bibelot pinpricking songwriter hath whists condemners bonnyclabber acreages sanitary hindrances reanimates takeouts coccidiosis lensing norite punkies overstaying aureolae lobsticks cheekinesses outscored judges wops inhumanities defoliations mysticly communicators bagging agapeic intubates afterlife forwards resultant straightjacketing arsenopyrites skirt codiscovering microphyll vicunas radishes tintinnabulations fodders solidaristic dizzily transferrable cookings subdepot antiparasitics synthesist controverted grison rescinders possessive substitutive nucleonics scientific misphrasing serviceberry shipwrecks ferbam ionospheric waitstaff dynamometries ascendant zeroth neuropathologic refocussed craniosacral contractually corrupts poilu openheartedness butterflyers goldfinch wordage provoking deism idolism cunningness greys lithoid thenceforwards darkling woefulness electrolyte cheongsam hypercorrectnesses relets rehems arabic coppered safflower sprats bloodstream elegizing reiving yirred beachcombers derogate arcing honeycombing incensed remorsefulnesses internationalize moles peristaltic reexpresses orthographical allseed heathendoms recruitment talkativenesses hydroplane rouletting dormins purpuras policyholders arbitrable militiaman veinlike nargile pile snuffles fondles laciness filling nonregulated animal vilifiers gerrymandering gentrice rescript lodgments acaudal pointman whaleman genome glassworkers seggar deliriums sibilations hallows euxenites speedwell soling tying promontories gulpy loopiest mailes inbreeding wry fets detoxicants infestation planetaria trindle sonneteerings caid quadrivium avulses washrooms keeper step occipita scheming swale obsessives endeavoring thoroughgoing rotator skimmed methylations bluster atavism birses costermonger emplacing mantas uncock backtracks soil blanch lateens oxidising deface gharials wheeziest sodium subalpine fardels triethyl surceases mantelshelf pedologies chuckled peneplane perry stomachy damped desmosomes curiae flannelettes arisen snowberries saltant filariases lealties abetted doubtful aventails hydrobiology coordinators unlawfulness dethroning septuagenarian subcapsular ta dovishness atemoya spiraeas lycopods incident tsorriss stranding haustorium deerberry screamed podestas sibilances modiste limbing eupatrids mustiest angstrom palace syrphid lepidopterists toilsomenesses jettons conciser tambourine coached unconditional backrooms prototypically fetoscopy sedimentologic genes concessively limonites planless recombing gundog lobations slid eutaxy boodler intercalating photobiologic scorpions noospheres jactitations rhizoctonia exaltation unactorish surtaxing reaccredits valiantnesses cardamums egocentrics discerned bumptiousnesses fearers intersterile demeanours couteaux setback bioelectricities snooded logicising lolled andalusites phenolphthaleins muckraker dalliers noncolored grandsirs becrawls singling swellheads spiks bushidos necropsied pedlary resinifies hyoscines pronunciamentos cremating puttied calcareously bildungsromans readjustment outjump wispish lithified anodizes residuary pewters antimaterialists humerus inventorial antibaryon paleomagnetically gleeds trapesed quintuplicate cuttled feelingly unhair deifical bratwurst journalese teocallis restrooms teniae vexatious citrins eviction noncontemporary busloads onomatopoetic coassumed enframes nincompooperies sousaphones snoopily sociogram dangerous semisynthetic astrophysics phonemicists carabins upraise wrasse harks regretfulnesses semiwild maximization drachmas mountainously isinglasses ulamas purls arboured pregnabilities incomparability overweens groan assiduousness teawares theoretically accentuates spiracle methodises missives tenable warpower prepregs nonutility sambo puttyroot sufferances irreligious autumn outraised jinricksha harborages federalization reformulating pantisocratists hehs metages staccati demulcents overburned odometries smokeable simplenesses zymosan pharmacologists circuses canoness tictocking nucleoplasms profligate oilholes sermonizes drifty wetwares estranger kelsons colligated delocalize denervate grayish polyclonal shuddery tapestried pemphixes portrays ultravirile olivenites nitrating trochanteral indiscriminately kolkhozniks embellish defaces egging qat splats budgerigars whoopie nostalgic benignities endemically coifed redips semigroups vigintillion escalloping postconception swillers anorexies valencias frugivores cozens accouchement planters sprucier immediatenesses dissuasiveness uncharitableness haptens loafing cajoles floccus reshown driveled lapidary princeliest caporal collectivized analogue strangeness prosthodontists pyknics indexation otoliths heartaches weakhearted practised drying diamantes tacitly suttas zorils chillum camouflageable ruptured ventricose dwelt drooping rewrapped octavo jackasses misgrafted forks oarsman wooled keeks unfitnesses audiometries unhousing dermatologists superficiality hypermedias mugged harts sensualities nonclassical groundbreaker weakside scrupulously handwork holdup unavailingness redelivers albinotic reconsolidated buttock lexicality knapsack redefecting tweeted martial primipara mistook gegenscheins shivareeing talcum gestating electrodes whitewashes commutative unravelling logion bauhinias thermostated dados umbonic rhythmist egression restudies laypeople erasures unscrewing sirenian outpace oversuds teetotally asthenics parenteral overshot spale scoriaceous noters inventor pommeling fuehrer disintermediations resegregate mahuang prolocutors insectan machicolation casked leukodystrophy malposition cycled raveners paraphrases counterstrikes nertz stouter cavetti salterns rectification choreographic subaudible newie premodifications truckles wapitis tort showcases romancing thous burnous wore graphite pingoes xu uncrown famousnesses caudate beleaps malarial synonymized dropsy ingulfed alant nosologic usurper reimpression quandary recentrifuge overmixing plumbism insolations cleavable acclaims boosting succinctest bardolater veer sorbitol torched warrants benison willowlike propjet radiobiologies doable greenbug begirding effectualities smogless sockdologers hominesses soroses mizzens hospice tawsing smaragds retries orthopteroids bewilderedly retires zoogeographers dystonic fearlessness germ mycobacterium peacekeeper quantified troubleshooters interferometric nereids ineluctability wayfaring utilizable cyclized uxorious inhumanities tearier amiablenesses turbojet grouter etude adjutancy ribbon anilinguses fashionably latish umbrageousness paroled theorematic hexosans counterthreats learn short layman orphaned gypsophila crumbly boodling carling linear diageneses enemy cheerfulness prolonges frizzed platings diarchy sourdine rooflike mahoe disadvantages atheneum adulterous photodissociation provocatively slot celoms impetuous mitt bejeezus spindlier chiliastic postindependence prudishly summerwoods retear butled indirectnesses manslaughter flagrances bureaucratically overstaffed abattoirs playbooks bogged frized jacinthes cabbageworms becrust mestino inhabiter trochili rancidity outleap sodalities odorizes anticholinergics heptarchs haulms velarized undotted blousiest disestablishment uncaked termed citrated officialeses endbrains conglomerations epilogue destination bourgeoise ulcer hognoses jiggles pallidnesses screeches oriole anatomized homebrews immunoprecipitating spuriously blowfish batts lentigo adorers monetise trimming hypercritic superficialities astrological obstructor driftage scatter inflictions supermales finalities advocating racemic physiography rubeolas bendaying warmongerings inhibit silk autochthons knosp surreys correctors coordinative tailleurs gaen braininesses uneasinesses hydrophobicities orchestra araks scapegoats picoting rieslings horrified lamentedly hyponeas devolved adzes bedstead santo logogriphs reearning pandy spearmen hiking aspirational mosquito careen ruffianism sporocarps profound phalanx subgum curatorships scrimmaging encyclical fatheaded occultism coenamor metamorphisms rashes mus].map {|w| gw w }
 
 # 开始猜测单词
 [1..5, 1..8, 1..12, 12..20].each do |range|
@@ -237,34 +246,3 @@ end
   20.times do |idx|
   end
 end if nil
-
-
-
-
-__END__
-irb(main):497:0> guess_word 1..8, "COMAKER"
-***A***
-*******
-*******
-*******
-*******
-*O*****
-**M****
-*******
-*******
-C******
-*******
-******R
-*******
-*******
-*******
-*******
-*******
-*******
-*******
-*******
-*******
-*******
-*******
-****K**
-=> 25
