@@ -98,7 +98,11 @@ end
 words = (File.read("/Users/mvj3/github/joycehan/strikingly-interview-test-instructions/data/words.txt").split("\n") + %w[a i]).map(&:upcase)
 
 # 建立有位置信息的字母 映射到 单词 的哈希表
-# 比如 { :o1 => [:word, :wood] }
+# {len => { :char_pos => words } }
+#
+# TODO 其他数据结构，但这个只能提高查找效率，不能减少猜字母的次数。
+# {:len_char_pos => words }
+# {:len => {char => { pos => words } } }
 Length_to__char_num_to_words__hash = words.inject({}) do |h, w|
   h[w.length] ||= {}
   w.chars.each_with_index do |c, c_idx|
