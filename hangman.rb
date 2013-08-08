@@ -154,6 +154,10 @@ def matched_char_with_idx_in_str _result
   _a
 end
 
+def guessing_word
+  @char_with_idx_array.sort_by {|c3| c3.to_s[1..-1].to_i }.map {|c3| c3[0] }.join
+end
+
 # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
 # 知道找到，才切换下一个为元音。
 # 辅音同理。
@@ -161,7 +165,6 @@ def select_next_vowel_or_consonant
   _cs = next_guess_chars(@matched_words)
   _list = VowelList.index(@guessed_chars[-1]) ? ConsonantList : VowelList
   _c1 = _cs.detect {|c| _list.index(c) }
-  # require 'pry-debugger';binding.pry
   _c1 || _cs[0] # 兼容元音数量少的情况
 end
 
@@ -246,11 +249,7 @@ def guess_word range, w1 = nil
   end
 
   # 察看是否完全匹配
-  _w = if @w1_length > @matched_chars_count
-    "没有找到"
-  else
-    @char_with_idx_array.sort_by {|c3| c3.to_s[1..-1].to_i }.map {|c3| c3[0] }.join
-  end
+  _w = (@w1_length > @matched_chars_count) ? "没有找到" : guessing_word
 
   puts "猜测 次数:#{@guessed_time} 单词:#{_w} 单词长度:#{_w.length} 顺序:#{@guessed_chars}"
   puts
