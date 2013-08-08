@@ -59,6 +59,7 @@ class StrikinglyInterview
   def remain_time; data['numberOfGuessAllowedForThisWord']; end
   def data; @current_response['data']; end
   def status; @current_response['status']; end
+  def success?; @current_response.success? end
 
   def request data = {}
     HTTParty.post(REQUEST_URL, {

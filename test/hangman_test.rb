@@ -17,7 +17,7 @@ class TestHangman < Test::Unit::TestCase
       @hangman = Hangman.new(@si)
       @hangman.init_guess
 
-      puts "该单词长度为#{@si.word.count}， 可以猜#{@si.remain_time} 次。"
+      puts "该单词长度为#{@si.word.size}， 可以猜#{@si.remain_time} 次。"
       while (!@hangman.done? && !@si.remain_time.zero?) do
         @hangman.guess
       end

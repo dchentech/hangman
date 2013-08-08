@@ -12,7 +12,7 @@ class Hangman
     @source = source
 
     # check @source's methods
-    [:word, :make_a_guess, :give_me_a_word, :status].each do |m|
+    [:word, :make_a_guess, :give_me_a_word, :status, :success?].each do |m|
       raise "#{@source}'s class #{@source.class} havent defined method :#{m}" if not @source.methods.include? m
     end
 
@@ -23,6 +23,7 @@ class Hangman
   end
 
   # delegate behaviors to @source
+  def success?; @source.success?  end
   def word; @source.word end
   def done?; word.count('*').zero? end
   def init_guess; @source.give_me_a_word end
@@ -44,7 +45,7 @@ class Hangman
     # 这次猜测有匹配！
     # require 'pry-debugger'; binding.pry
     begin
-    if word.count('*') < _old_asterisk_count
+    if success? && (word.count('*') < _old_asterisk_count)
       # 根据匹配的位置继续过滤 候选单词列表
       # @return { char => [3, 5] }
       word.chars.each_with_index do |_char, idx|
