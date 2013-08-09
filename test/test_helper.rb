@@ -32,7 +32,11 @@ class Test::Unit::TestCase
       # require 'pry-debugger';binding.pry
       while (!@hangman.done? && !source.remain_time.zero?) || !source.network_success? do # 兼容网络错误
         print "#{source.remain_time}."
-        @hangman.guess
+
+        if not @hangman.guess
+          break # no candidate letters, and @hangman will not connect source any more
+        end
+
         begin
           sleep 3 if not source.network_success?
         rescue Timeout::Error, EOFError => e
