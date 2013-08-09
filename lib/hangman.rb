@@ -3,6 +3,7 @@
 require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
+require File.expand_path('../source/strikingly_interview.rb', __FILE__)
 
 # TODO log words and their unmatched words to database
 # TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
