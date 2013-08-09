@@ -58,8 +58,15 @@ class HangmanTest < Test::Unit::TestCase
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       source.submit_test_results 
     end if @scores
+    return score
+  end 
 
+
+  def test_idxes_of_char_in_the_word
+    @hangman = Hangman.new(Struct.new(:hangman).new)
+    assert_equal @hangman.idxes_of_char_in_the_word('WOOD', 'O'), [1, 2]
   end
+
 end
 
 puts "单词长度对应的所有单词总数表"

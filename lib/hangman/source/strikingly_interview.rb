@@ -37,7 +37,7 @@ class Hangman
     end
 
     def word; current_response['word'] end
-    def init_guess; @source.give_me_a_word end
+    def init_guess; give_me_a_word end
     def guessed_time; data['numberOfWordsTried'].to_i end
     def remain_time; data['numberOfGuessAllowedForThisWord'].to_i end
     def number_of_words_to_guess; data['numberOfWordsToGuess']; end

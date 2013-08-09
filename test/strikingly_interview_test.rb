@@ -7,13 +7,13 @@ class StrikinglyInterviewTest < HangmanTest
     @scores = []
 
     100.times do
-      play_hangman Hangman::StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
+      score = play_hangman Hangman::StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
 
       @scores << score
       `echo #{score} >> scores`
       puts @scores.sort.inspect
     end
 
-  end if nil
+  end if ENV['StrikinglyInterview']
 
 end

@@ -10,6 +10,6 @@ class HangmanTest < Test::Unit::TestCase
 
   def test_local
     play_hangman Hangman::Local.new
-  end
+  end if not ENV['StrikinglyInterview']
 
 end
