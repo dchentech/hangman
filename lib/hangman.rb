@@ -150,7 +150,14 @@ class Hangman
       break if _chars.size.zero?
 
       is_has_match = !!(rest_asterisk_idxes.detect do |_idx|
-        Length_to__char_num_to_words__hash[word_length]["#{_c1}#{_idx}".to_sym]
+        _result = Length_to__char_num_to_words__hash[word_length]["#{_c1}#{_idx}".to_sym]
+
+        # 如果这个位置的字母不存在，那么就去@matched_words也删掉符合的
+        @matched_words.delete_if do |_w1|
+          _w1.chars.to_a[_idx] == _c1
+        end if not _result
+
+        _result
       end)
 
       if not is_has_match
