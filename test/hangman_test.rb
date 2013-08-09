@@ -23,7 +23,7 @@ class TestHangman < Test::Unit::TestCase
         begin
           @hangman.guess
         rescue => e
-          e.id; require 'pry-debugger'; binding.pry
+          e.class; require 'pry-debugger'; binding.pry
           # TODO EOFError: end of file reached
         end
       end
@@ -33,12 +33,17 @@ class TestHangman < Test::Unit::TestCase
       puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"
       puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
-      puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
+      if @hangman.matched_words.count == 1
+        puts "猜中的单词是#{@hangman.matched_words[0]}！"
+      else
+        puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
+      end
       puts
       Hangman.word_recorder.info @hangman.word if @hangman.done?
     end
 
-    require 'pry-debugger'; binding.pry
+    s = @si.get_test_results
+    s.class; require 'pry-debugger'; binding.pry
     @si.get_test_results
   end
 

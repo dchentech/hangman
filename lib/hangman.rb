@@ -3,9 +3,12 @@
 require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
+
 # TODO log words and their unmatched words to database
 # TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
 # TODO 并发测试，网络速度太慢
+# TODO http://www.datagenetics.com/blog/april12012/index.html#result
+# TODO 记录下猜不到的单词的相关信息，下次可以优先根据其中相反的词频猜。
 
 class Hangman
   attr_reader :source
@@ -13,6 +16,7 @@ class Hangman
 
   def initialize source
     @source = source
+    @source.hangman = self
 
     # check @source's methods
     [:word, :make_a_guess, :give_me_a_word, :status, :success?].each do |m|
@@ -41,6 +45,7 @@ class Hangman
 
     #require 'pry-debugger'; binding.pry
     _current_guess_char = current_guess_char
+    # return false if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char
 
     # Number of Allowed Guess on this word is 0, please get a new word
@@ -63,7 +68,7 @@ class Hangman
       # break # 成功后继续猜 下一个字母
     end
     rescue => e
-      e.id; require 'pry-debugger'; binding.pry
+      e.class; require 'pry-debugger'; binding.pry
     end
 
   end
@@ -115,9 +120,8 @@ class Hangman
     return _a
   end
 
-
   # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
-  # 知道找到，才切换下一个为元音。
+  # 直到找到，才切换下一个为元音。
   # 辅音同理。
   def select_next_vowel_or_consonant
     # avaible unguessed chars from @matched_words
@@ -128,26 +132,12 @@ class Hangman
     _c1 || _chars[0] # 兼容元音数量少的情况
   end
 
-  def guess_word
-    while (matched_chars_count != word_length) do
-
-      puts "[剩余单词数量#{@matched_words.count}] : [已匹配字母数量#{matched_chars_count}] #{c1}: #{result}"
-      puts @matched_words.inspect if ENV['DEBUG']
-    end
-
-    puts "猜测 次数:#{@source.guessed_time} 单词:#{word} 单词长度:#{word.length} 顺序:#{@guessed_chars}"
-    puts
-    raise "猜测次数 不可能少于 单词含有的唯一字母个数" if @source.guessed_time < _w.chars.to_a.uniq.length
-    return @source.guessed_time
-  end
-
-  def range; word_length..word_length end
   def word_length; @_word_length_cache ||= word.length end
+  def range; word_length..word_length end
   def matched_chars_count; word.length - word.count('*').length end
 
 end
 
-# TODO http://www.datagenetics.com/blog/april12012/index.html#result
 
 
 class Hangman

@@ -23,6 +23,7 @@ class StrikinglyInterview
   REQUEST_URL = 'http://strikingly-interview-test.herokuapp.com/guess/process'
 
   attr_reader :secret, :current_response
+  attr_accessor :hangman
 
   def initialize userId
     @user_id = userId
@@ -55,9 +56,21 @@ class StrikinglyInterview
   end if nil
 
   def word; current_response['word'] end
-  def guessed_time; data['numberOfWordsTried']; end
-  def remain_time; data['numberOfGuessAllowedForThisWord']; end
-  def data; @current_response['data']; end
+  def guessed_time; data['numberOfWordsTried'].to_i end
+  def remain_time; data['numberOfGuessAllowedForThisWord'].to_i end
+
+  def data
+    begin
+    if @current_response['data'].nil? && @current_response.responde_to?(:code) #503, 400
+      {}
+    else
+      @current_response['data']
+    end
+    rescue => e
+      e.class; require 'pry-debugger'; binding.pry
+    end
+
+  end
   def status; @current_response['status']; end
   def success?; @current_response.success? end
 
