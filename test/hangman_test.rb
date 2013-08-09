@@ -16,6 +16,9 @@ class TestHangman < Test::Unit::TestCase
   end
 
   def test_hangman
+    @scores = []
+
+    100.times do
     1.upto(@si.data['numberOfWordsToGuess']) do |time|
       @hangman = Hangman.new(@si)
       @hangman.init_guess
@@ -44,9 +47,17 @@ class TestHangman < Test::Unit::TestCase
       puts
     end
 
-    # TODO 如果分数比之前有提高才提交
     result = @si.get_test_results
-    @si.submit_test_results if (result['data']['numberOfCorrectWords'].to_f / result['data']['numberOfWordsTried'].to_f) > 0.75
-  end
+    total = result['data']['numberOfWordsTried'].to_f
+    score = @si.current_response['data']['numberOfCorrectWords']
+    if ((score / total) > 0.75) && (score > @scores.max.to_i)
+      @si.submit_test_results 
+    end
 
+    @scores << score
+    `echo #{score} >> scores`
+    puts @scores.sort.inspect
+    end
+
+  end
 end
