@@ -75,7 +75,7 @@ class Test::Unit::TestCase
     result = source.get_test_results['data']
     total = result['numberOfWordsTried'].to_f
     score = result['numberOfCorrectWords'].to_f
-    puts result
+    puts "猜单词结果是: #{result.inspect}"
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       # TODO 多个进程共享最大猜测数
       source.submit_test_results if score > 67 # TODO update

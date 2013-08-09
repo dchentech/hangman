@@ -12,8 +12,17 @@ class HangmanTest < Test::Unit::TestCase
 
 
   def test_local
-    play_hangman Hangman.new(Hangman::Local.new(%w[WORD]))
-  end if not ENV['StrikinglyInterview']
+    # 测试80个单词
+    play_hangman Hangman::Local.new
+
+    sleep 3
+
+    # 测试8000个单词
+    s = Hangman::Local.new
+    def s.number_of_words_to_guess; 8000; end
+    s.instance_variable_set("@words", Hangman::Words.dup.map(&:to_s).select {|w| w.length < 19 }.shuffle[0..(s.number_of_words_to_guess-1)])
+    play_hangman s
+  end
 
   def test_idxes_of_char_in_the_word
     @h = Hangman.new(Hangman::Local.new(%w[WORD]))
@@ -78,4 +87,5 @@ class HangmanTest < Test::Unit::TestCase
     s.init_guess
     s
   end
+
 end
