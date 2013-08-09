@@ -5,7 +5,7 @@ require 'json'
 class Hangman
   class Source
     attr_accessor :hangman
-    attr_reader   :current_response
+    attr_reader   :current_response, :guessed_time
 
     InstanceMethods = [
       :word,
@@ -17,6 +17,7 @@ class Hangman
       :guessed_time,
       :remain_time,
     ]
+
 
   end
 

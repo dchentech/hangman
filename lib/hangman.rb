@@ -35,13 +35,13 @@ class Hangman
 
   def guess
     raise "Please #init_guess first" if word.nil?
+    #require 'pry-debugger'; binding.pry
 
     # 退出，比如全部都是重复字母，包括一两个字母，比如A, AA
     return false if matched_chars_with_idx.length == word_length
 
     _old_asterisk_count = word.count('*')
 
-    #require 'pry-debugger'; binding.pry
     _current_guess_char = current_guess_char
     return false if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char

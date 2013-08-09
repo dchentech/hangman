@@ -51,12 +51,13 @@ class HangmanTest < Test::Unit::TestCase
       puts
     end
 
-    result = source.get_test_results
-    total = result['data']['numberOfWordsTried'].to_f
-    score = source.current_response['data']['numberOfCorrectWords']
+    result = source.get_test_results['data']
+    total = result['numberOfWordsTried'].to_f
+    score = result['numberOfCorrectWords'].to_f
+    puts result
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       source.submit_test_results 
-    end
+    end if @scores
 
   end
 end

@@ -17,12 +17,3 @@ class StrikinglyInterviewTest < HangmanTest
   end if nil
 
 end
-
-
-__END__
-c = @hangman.guess
-
-if !@hangman.is_current_matched? && (@hangman.matched_words || []).detect {|w| w.to_s.include?(c) }
-  require 'pry-debugger'; binding.pry
-end
-
