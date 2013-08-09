@@ -46,6 +46,9 @@ class Hangman
     return "no char" if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char
 
+    # 兼容一个都没有匹配
+    @matched_words ||= [] if @source.remain_time.zero?
+
     return false if not @source.network_success?
     setup_matched_words
 
@@ -168,7 +171,7 @@ class Hangman
 
         # 如果这个位置的字母不存在，那么就去@matched_words也删掉符合的
         @matched_words.delete_if do |_w1|
-          _w1.chars.to_a[_idx] == _c1
+          _w1.to_s.chars.to_a[_idx] == _c1
         end if not _result
 
         _result
@@ -183,7 +186,7 @@ class Hangman
     _c1
   end
 
-  def word_length; @_word_length_cache ||= word.length end
+  def word_length; word.length end
   def range; word_length..word_length end
   def matched_chars_count; word.length - word.count('*').length end
 
