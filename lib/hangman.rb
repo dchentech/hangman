@@ -31,7 +31,7 @@ class Hangman
   end
 
   # delegate behaviors to @source
-  def success?; @source.success?  end
+  def network_success?; @source.success?  end
   def word; @source.word end
   def done?; word && word.count('*').zero? end
   def init_guess; @source.give_me_a_word end
@@ -53,18 +53,22 @@ class Hangman
     return false if @source.status == 400
 
     begin
-    if success? && @matched_words # compactible with herokuapp error
+    if network_success? && @matched_words # compactible with herokuapp error
       # 这次猜测有匹配！
-      if word.count('*') < _old_asterisk_count
+      if @is_current_matched = word.count('*') < _old_asterisk_count
         # 根据匹配的位置继续过滤 候选单词列表
         # @return e.g. { char => [3, 5] }
         word.chars.each_with_index do |_char, idx|
           next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
           @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
         end
+        # 排除 包含匹配字母, 但是不在相同位置的 单词
+        @matched_words.delete_if do |w|
+          (idxes_of_char_in_the_word(w, _current_guess_char) - idxes_of_char_in_the_word(word, _current_guess_char)).any?
+        end
       else
         # reject no match words
-        @matched_words = @matched_words.reject {|w| w.to_s.match(_current_guess_char) }
+        @matched_words.delete_if {|w| w.to_s.include?(_current_guess_char) }
       end
       # break # 成功后继续猜 下一个字母
     end
@@ -72,6 +76,7 @@ class Hangman
       e.class; require 'pry-debugger'; binding.pry
     end
 
+    return _current_guess_char
   end
 
   # @return e.g. 'E'
@@ -114,23 +119,27 @@ class Hangman
 
   # @return e.g. [:N2, :N6]
   def matched_chars_with_idx
-    _a = []
-    word.chars.each_with_index do |c1, idx|
+    __map_on_word(word, (proc do |c1, idx, _a|
       _a << "#{c1}#{idx}".to_sym if c1 != '*'
-    end
-    return _a
+    end))
   end
 
   # @ return e.g. [3, 5]
   def rest_asterisk_idxes
-    _a = []
-    word.chars.each_with_index do |c1, idx|
+    __map_on_word(word, (proc do |c1, idx, _a|
       _a << idx if c1 == '*'
-    end
-    return _a
+    end))
   end
 
+  def idxes_of_char_in_the_word _w, _c
+    __map_on_word(_w, (proc do |c1, idx, _a|
+      _a << idx if c1 == _c
+    end))
+  end
 
+  def is_current_matched?; !!@is_current_matched; end
+
+  
   # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
   # 直到找到，才切换下一个为元音。
   # 辅音同理。
@@ -173,8 +182,16 @@ class Hangman
   def range; word_length..word_length end
   def matched_chars_count; word.length - word.count('*').length end
 
-end
+  private
+  def __map_on_word _w, _filter = (proc {|c1, idx, _a| })
+    a = []
+    _w.to_s.chars.each_with_index do |c1, idx|
+      _filter.call(c1, idx, a)
+    end
+    return a
+  end
 
+end
 
 
 class Hangman

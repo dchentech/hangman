@@ -23,11 +23,23 @@ class TestHangman < Test::Unit::TestCase
       @hangman = Hangman.new(@si)
       @hangman.init_guess
 
+      a = []
       puts "该单词长度为#{@si.word.size}， 可以猜#{@si.remain_time} 次。"
       while (!@hangman.done? && !@si.remain_time.zero?) || !@si.success? do # 兼容网络错误
         print "#{@si.remain_time}."
         begin
-          @hangman.guess
+          sleep 3 if not @si.success?
+          a << @si.remain_time
+          if a.count(@si.remain_time) > 5
+            #require 'pry-debugger'; binding.pry
+          end
+
+          c = @hangman.guess
+
+          if !@hangman.is_current_matched? && (@hangman.matched_words || []).detect {|w| w.to_s.include?(c) }
+            require 'pry-debugger'; binding.pry
+          end
+
         rescue Timeout::Error => e
           next
         rescue => e
@@ -41,16 +53,16 @@ class TestHangman < Test::Unit::TestCase
       puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"
       puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
+      if @hangman.matched_words.nil?
+        require 'pry-debugger';binding.pry
+      end
+        
       if @hangman.matched_words.count == 1
         puts "猜中的单词是#{@hangman.word}！"
       else
         puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
       end
       puts
-
-      if @hangman.matched_words.count.zero?
-        require 'pry-debugger';binding.pry
-      end
     end
 
     result = @si.get_test_results
