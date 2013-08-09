@@ -24,7 +24,7 @@ class TestHangman < Test::Unit::TestCase
       @hangman.init_guess
 
       puts "该单词长度为#{@si.word.size}， 可以猜#{@si.remain_time} 次。"
-      while (!@hangman.done? && !@si.remain_time.zero?) do
+      while (!@hangman.done? && !@si.remain_time.zero?) || !@si.success? do # 兼容网络错误
         print "#{@si.remain_time}."
         begin
           @hangman.guess
