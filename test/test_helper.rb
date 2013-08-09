@@ -38,10 +38,11 @@ class Test::Unit::TestCase
         end
 
         if not @hangman.network_success?
+          @hangman = Hangman.new(source)
           @hangman.init_guess
         end
 
-        if @hangman.source.current_response.nil? || @hangman.source.current_response.inspect.match(/503/)
+        if @hangman.source.current_response.nil? || @hangman.source.current_response.inspect.match(/HTTPServiceUnavailable/)
           require 'pry-debugger';binding.pry
         end
 
@@ -59,7 +60,7 @@ class Test::Unit::TestCase
       puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
         
-      if @hangman.matched_words.count == 1
+      if (@hangman.matched_words.count == 1) && (@hangman.matched_words[0].to_s == @hangman.word)
         puts "猜中的单词是#{@hangman.word}！"
       else
         puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"

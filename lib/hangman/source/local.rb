@@ -19,6 +19,7 @@ class Hangman
       @numberOfGuessAllowedForThisWord = 10
       @guessed_time = 0
       @word = @words.pop
+      raise "no word anymore" if @word.nil?
       @marked_word_hash = (0..(@word.length-1)).inject({}) {|h, n| h[n] = '*'; h }
     end
     

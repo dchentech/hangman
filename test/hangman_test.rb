@@ -6,32 +6,40 @@ class HangmanTest < Test::Unit::TestCase
   def setup
     @ws1 = %w[COMAKER CUMULATE ERUPTIVE FACTUAL MONADISM MUS NAGGING OSES REMEMBERED SPODUMENES STEREOISOMERS TOXICS TRICHROMATS TRIOSE UNIFORMED]
     @ws2 = File.read(File.expand_path('../../data/1000words.txt', __FILE__)).split
-    @local1 = Hangman::Local.new(%w[WORD])
-    @h = Hangman.new(@local1)
+    #@local1 = Hangman::Local.new(%w[WORD])
+    #@h = Hangman.new(@local1)
   end
 
 
   def test_local
-    play_hangman @local1
+    play_hangman Hangman.new(Hangman::Local.new(%w[WORD]))
   end if not ENV['StrikinglyInterview']
 
   def test_idxes_of_char_in_the_word
+    @h = Hangman.new(Hangman::Local.new(%w[WORD]))
+    @h.init_guess
+
     assert_equal [1, 2], @h.idxes_of_char_in_the_word('WOOD', 'O')
   end
 
   def test_current_guess_char
-    fake_h
+    @h = Hangman.new(Hangman::Local.new(%w[WORD]))
+    @h.init_guess
+
     assert_equal "A", @h.current_guess_char
     assert_equal "E", @h.current_guess_char
   end
 
   def test_matched_chars_with_idx
-    fake_h
+    @h = Hangman.new(Hangman::Local.new(%w[WORD]))
+    @h.init_guess
+
     assert_equal([], @h.matched_chars_with_idx)
   end
 
   def test_others
-    fake_h
+    @h = Hangman.new(Hangman::Local.new(%w[WORD]))
+    @h.init_guess
 
     assert_equal(false,  @h.done?)
     assert_equal "A", @h.guess
@@ -49,13 +57,25 @@ class HangmanTest < Test::Unit::TestCase
 
   def test_words
     # Hangman::Words.select {|w| w[2..4] == 'EAC' }.select {|w| w.size == 10 } => ["BLEACHABLE", "PREACHIEST", "PREACHMENT"]
-    @local1 = Hangman::Local.new(["BLEACHABLE", "PREACHIEST", "PREACHMENT"])
-    @h = Hangman.new(@local1)
+    # *E**E*BE*
+    # Hangman::Words.select {|w| w[2..4] == 'EAC' }.select {|w| w.size == 10 } => ["BLEACHABLE", "PREACHIEST", "PREACHMENT"]
+    # test PSALM
+    #@local1 = Hangman::Local.new(["BLEACHABLE", "PREACHIEST", "PREACHMENT"])
+    #@h = Hangman.new(@local1)
     # 20.times { @h.guess }
   end
 
-  private
-  def fake_h
+  def test_PSALM
+    @h = Hangman.new(Hangman::Local.new(%w[PSALM]))
     @h.init_guess
+
+    15.times { @h.guess }
+  end
+
+  private
+  def hg words
+    s = Hangman.new(Hangman::Local.new(words))
+    s.init_guess
+    s
   end
 end
