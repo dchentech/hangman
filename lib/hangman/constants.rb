@@ -48,7 +48,7 @@ EOF
   # 获取单词列表
   # http://nifty.stanford.edu/2011/schwarz-evil-hangman/dictionary.txt
   # 里面已包含 Plural, Tenses Adjectives
-  words = (File.read(File.expand_path('../../../data/words.txt', __FILE__)).split("\n") + %w[a i]).map(&:upcase)
+  Words = (File.read(File.expand_path('../../../data/words.txt', __FILE__)).split("\n") + %w[a i]).map(&:upcase)
 
   # 建立有位置信息的字母 映射到 单词 的哈希表
   # {len => { :char_pos => words } }
@@ -57,7 +57,7 @@ EOF
   # {:len_char_pos => words }
   # {:len => {char => { pos => words } } }
   _h = Hash.new { 0 }
-  Length_to__char_num_to_words__hash = words.inject({}) do |h, w|
+  Length_to__char_num_to_words__hash = Words.inject({}) do |h, w|
     _h[w.length] += 1
 
     h[w.length] ||= {}
