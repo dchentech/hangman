@@ -9,6 +9,9 @@ ws2 = File.read(File.expand_path('../../data/1000words.txt', __FILE__)).split
 
 class TestHangman < Test::Unit::TestCase
   def setup
+    puts "单词长度对应的所有单词总数表"
+    Hangman::Length_to__words_count_hash.each {|k,v| puts "#{k}:#{v}" }
+    puts 
     @si = StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
   end
 

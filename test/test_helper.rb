@@ -61,7 +61,7 @@ class StrikinglyInterview
 
   def data
     begin
-    if @current_response['data'].nil? && @current_response.responde_to?(:code) #503, 400
+    if @current_response['data'].nil? && @current_response.respond_to?(:code) #503, 400
       {}
     else
       @current_response['data']
@@ -85,8 +85,10 @@ class StrikinglyInterview
     })
   end
 
-end
+  def inspect
+    "#<#{self.class}:#{self.object_id.to_s(16)} @user_id=#{@user_id.inspect}, @current_response=#{@current_response.inspect}>"
+  end
 
-# TODO write word to file
+end
 
 #  `curl -X POST -H "Content-Type: application/json" -d '{"action":"initiateGame","userId":""}' #{REQUEST_URL}`
