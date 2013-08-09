@@ -28,13 +28,21 @@ class Test::Unit::TestCase
       @hangman = Hangman.new(source)
       @hangman.init_guess
 
-      puts "该单词长度为#{source.word.size}， 可以猜#{source.remain_time} 次。"
-      # require 'pry-debugger';binding.pry
+      puts "该单词长度为#{source.word.to_s.size}， 可以猜#{source.remain_time} 次。"
       while (!@hangman.done? && !source.remain_time.zero?) || !source.network_success? do # 兼容网络错误
         print "#{source.remain_time}."
 
-        if not @hangman.guess
+        # TODO 兼容不在词典里的，策略是give me a new word
+        if @hangman.guess == "no char"
           break # no candidate letters, and @hangman will not connect source any more
+        end
+
+        if not @hangman.network_success?
+          @hangman.init_guess
+        end
+
+        if @hangman.source.current_response.nil? || @hangman.source.current_response.inspect.match(/503/)
+          require 'pry-debugger';binding.pry
         end
 
         begin
@@ -46,7 +54,8 @@ class Test::Unit::TestCase
         end
       end; print "\n"
 
-      puts "第#{time}次 #{@hangman.done? ? '成功' : '失败'}"
+      begin
+      puts "第#{time}个单词 => #{@hangman.done? ? '成功' : '失败'}"
       puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
         
@@ -56,6 +65,10 @@ class Test::Unit::TestCase
         puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
       end
       puts
+      rescue => e
+       require 'pry-debugger';binding.pry
+      end
+
     end
 
     result = source.get_test_results['data']
@@ -63,7 +76,8 @@ class Test::Unit::TestCase
     score = result['numberOfCorrectWords'].to_f
     puts result
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
-      source.submit_test_results 
+      # TODO 多个进程共享最大猜测数
+      source.submit_test_results if score > 67 # TODO update
     end if @scores
     return score
   end 

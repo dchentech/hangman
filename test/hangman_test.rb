@@ -47,6 +47,13 @@ class HangmanTest < Test::Unit::TestCase
     @h.guess
   end
 
+  def test_words
+    # Hangman::Words.select {|w| w[2..4] == 'EAC' }.select {|w| w.size == 10 } => ["BLEACHABLE", "PREACHIEST", "PREACHMENT"]
+    @local1 = Hangman::Local.new(["BLEACHABLE", "PREACHIEST", "PREACHMENT"])
+    @h = Hangman.new(@local1)
+    # 20.times { @h.guess }
+  end
+
   private
   def fake_h
     @h.init_guess

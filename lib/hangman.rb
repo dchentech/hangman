@@ -7,7 +7,7 @@ require File.expand_path('../hangman/source.rb', __FILE__)
 
 # TODO log words and their unmatched words to database
 # TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
-# TODO 并发测试，网络速度太慢
+# 并发测试，网络速度太慢 =》 开启多个guard
 # TODO http://www.datagenetics.com/blog/april12012/index.html#result
 # TODO 记录下猜不到的单词的相关信息，下次可以优先根据其中相反的词频猜。
 
@@ -43,30 +43,43 @@ class Hangman
     _old_asterisk_count = word.count('*')
 
     _current_guess_char = current_guess_char
-    return false if _current_guess_char.nil?
+    return "no char" if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char
+
+    return false if not @source.network_success?
     setup_matched_words
+
     #require 'pry-debugger'; binding.pry
 
     # Number of Allowed Guess on this word is 0, please get a new word
-    return false if not @source.network_success?
 
     begin
     if network_success? && @matched_words # compactible with herokuapp error
+
       # 这次猜测有匹配！
-      if @is_current_matched = word.count('*') < _old_asterisk_count
+      if word.count('*') < _old_asterisk_count
+
         # 根据匹配的位置继续过滤 候选单词列表
         # @return e.g. { char => [3, 5] }
         word.chars.each_with_index do |_char, idx|
+          # 排除*或已经做过的
           next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
-          @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+
+          ws = Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+          @matched_words = @matched_words & (ws || [])
           @matched_words -= @unmatched_words
         end
-        # 排除 包含匹配字母, 但是不在相同位置的 单词
+
+        # 排除 包含匹配字母, 但是 *不在相同位置* 的单词
         word_idxes = idxes_of_char_in_the_word(word, _current_guess_char)
-        @matched_words.delete_if do |w|
-          (idxes_of_char_in_the_word(w, _current_guess_char) - word_idxes).any?
+        aa = []
+        @matched_words.delete_if do |_w|
+          s = (idxes_of_char_in_the_word(_w, _current_guess_char) - word_idxes).any?
+          aa << _w
+          s
         end
+        puts "删除了#{aa.size}个单词"
+
       else
         # reject no match words
         @matched_words.delete_if do |w|
@@ -95,6 +108,9 @@ class Hangman
       setup_matched_words
       
       # 如果词典中所有单词都不匹配
+      if @matched_words.nil?
+        require 'pry-debugger'; binding.pry
+      end
       return nil if @matched_words.size.zero?
 
       # 并求出接下来的字母及其位置
@@ -129,9 +145,6 @@ class Hangman
     end))
   end
 
-  def is_current_matched?; !!@is_current_matched; end
-
-  
   # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
   # 直到找到，才切换下一个为元音。
   # 辅音同理。

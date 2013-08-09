@@ -37,7 +37,15 @@ class Hangman
     end
 
     def word; current_response['word'] end
-    def init_guess; give_me_a_word end
+    def init_guess
+      s = give_me_a_word
+      # compatible with network error at the first time
+      while not network_success? do
+        s = give_me_a_word
+        sleep 3
+      end
+      s
+    end
     def guessed_time; data['numberOfWordsTried'].to_i end
     def remain_time; data['numberOfGuessAllowedForThisWord'].to_i end
     def number_of_words_to_guess; data['numberOfWordsToGuess']; end
@@ -78,6 +86,16 @@ end
 __END__
 ZETA应该被排除掉
 
+
+Started
+...删除了706个单词
+..该单词长度为4， 可以猜10 次。
+10.删除了200个单词
+10.9.8.7.
+第1次 失败
+依次猜过的5个字母: ["A", "B", "E", "C", "I"]
+最终匹配结果 #<Hangman::StrikinglyInterview:3fd8542ee7c8 @user_id="mvjome@gmail.com", @current_response=#<HTTParty::Response:0x7fb0a8709698 parsed_response="<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n    <html>\n    <head>\n      <meta http-equiv=\"content-type\" content=\"text/html; charset=ISO-8859-1\">\n      <style type=\"text/css\">\n        html, body, iframe { margin: 0; padding: 0; height: 100%; }\n        iframe { display: block; width: 100%; border: none; }\n      </style>\n    <title>Application Error</title></head>\n    </head>\n    <body>\n      <iframe src=\"//s3.amazonaws.com/heroku_pages/error.html\">\n        <p>Application Error</p>\n      </iframe>\n    </body>\n    </html>", @response=#<Net::HTTPServiceUnavailable 503 Service Unavailable readbody=true>, @headers={"content-type"=>["text/html"], "date"=>["Fri, 09 Aug 2013 13:53:10 GMT"], "server"=>["MochiWeb/1.0 (Any of you quaids got a smint?)"], "content-length"=>["601"], "connection"=>["Close"]}>>
+还没猜完的87个单词: [:DITA, :DIVA, :DONA, :DOPA, :DUMA, :DURA, :FILA, :FORA, :GIGA, :GLIA, :HILA, :HORA, :HOYA, :HULA, :HYLA, :ILIA, :ILKA, :INIA, :IOTA, :IXIA, :JOTA, :JUGA, :JURA, :KINA, :KIVA, :KOLA, :KUNA, :LIMA, :LIPA, :LIRA, :LOTA, :LUNA, :MINA, :MOLA, :MORA, :MOXA, :MURA, :MYNA, :NIPA, :NOMA, :NONA, :NOTA, :NOVA, :OHIA, :OKRA, :OLLA, :ORRA, :OSSA, :PIKA, :PIMA, :PINA, :PITA, :PROA, :PUJA, :PULA, :PUMA, :PUNA, :PUPA, :ROTA, :RUGA, :SIMA, :SKUA, :SODA, :SOFA, :SOJA, :SOLA, :SOMA, :SORA, :SOYA, :STOA, :SURA, :TOGA, :TOLA, :TORA, :TUFA, :TUNA, :ULNA, :ULVA, :URSA, :VIGA, :VINA, :VISA, :VITA, :VIVA, :WHOA, :YOGA, :YUGA]
 
 该单词长度为4， 可以猜10 次。
 10.9.9.8.7.6.5.4.3.2.1.
