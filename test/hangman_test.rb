@@ -12,13 +12,13 @@ class TestHangman < Test::Unit::TestCase
     puts "单词长度对应的所有单词总数表"
     Hangman::Length_to__words_count_hash.each {|k,v| puts "#{k}:#{v}" }
     puts 
-    @si = StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
   end
 
   def test_hangman
     @scores = []
 
     100.times do
+    @si = StrikinglyInterview.new(ENV['EMAIL'] || "moc.liamg@emojvm".reverse)
     1.upto(@si.data['numberOfWordsToGuess']) do |time|
       @hangman = Hangman.new(@si)
       @hangman.init_guess
@@ -28,6 +28,8 @@ class TestHangman < Test::Unit::TestCase
         print "#{@si.remain_time}."
         begin
           @hangman.guess
+        rescue Timeout::Error => e
+          next
         rescue => e
           e.class; require 'pry-debugger'; binding.pry
           # TODO EOFError: end of file reached
@@ -45,6 +47,10 @@ class TestHangman < Test::Unit::TestCase
         puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
       end
       puts
+
+      if @hangman.matched_words.count.zero?
+        require 'pry-debugger';binding.pry
+      end
     end
 
     result = @si.get_test_results

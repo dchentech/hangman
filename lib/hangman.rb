@@ -46,7 +46,7 @@ class Hangman
 
     #require 'pry-debugger'; binding.pry
     _current_guess_char = current_guess_char
-    # return false if _current_guess_char.nil?
+    return false if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char
 
     # Number of Allowed Guess on this word is 0, please get a new word
@@ -57,7 +57,7 @@ class Hangman
       # 这次猜测有匹配！
       if word.count('*') < _old_asterisk_count
         # 根据匹配的位置继续过滤 候选单词列表
-        # @return { char => [3, 5] }
+        # @return e.g. { char => [3, 5] }
         word.chars.each_with_index do |_char, idx|
           next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
           @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
@@ -74,7 +74,7 @@ class Hangman
 
   end
 
-  # return e.g. 'E'
+  # @return e.g. 'E'
   def current_guess_char
     case word.count("*")
     # 第一步: 依据词典词频找出第一个匹配的字母及其一或多个位置
@@ -112,7 +112,7 @@ class Hangman
     return _char
   end
 
-  # @return [:N2, :N6]
+  # @return e.g. [:N2, :N6]
   def matched_chars_with_idx
     _a = []
     word.chars.each_with_index do |c1, idx|
@@ -120,6 +120,16 @@ class Hangman
     end
     return _a
   end
+
+  # @ return e.g. [3, 5]
+  def rest_asterisk_idxes
+    _a = []
+    word.chars.each_with_index do |c1, idx|
+      _a << idx if c1 == '*'
+    end
+    return _a
+  end
+
 
   # 如果前一个是元音，那么下一个就是辅音，如果没找到，继续辅音，
   # 直到找到，才切换下一个为元音。
@@ -130,7 +140,26 @@ class Hangman
 
     _list = VowelList.index(@guessed_chars[-1]) ? ConsonantList : VowelList
     _c1 = _chars.detect {|c| _list.index(c) }
-    _c1 || _chars[0] # 兼容元音数量少的情况
+
+    # 判断该字母在剩余位置是否还有匹配,
+    # 如果没有，就调用下一个候选词
+    _c1_idx = 0
+    is_has_match = false
+    while not is_has_match do
+      _c1 ||= _chars[_c1_idx] # 兼容元音数量少的情况
+      break if _chars.size.zero?
+
+      is_has_match = !!(rest_asterisk_idxes.detect do |_idx|
+        Length_to__char_num_to_words__hash[word_length]["#{_c1}#{_idx}".to_sym]
+      end)
+
+      if not is_has_match
+        _c1_idx += 1
+        _c1 = _chars[_c1_idx]
+      end
+    end
+
+    _c1
   end
 
   def word_length; @_word_length_cache ||= word.length end
