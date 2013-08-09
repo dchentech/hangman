@@ -3,7 +3,7 @@
 require 'logger'
 require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
-require File.expand_path('../source/strikingly_interview.rb', __FILE__)
+require File.expand_path('../hangman/source.rb', __FILE__)
 
 # TODO log words and their unmatched words to database
 # TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
@@ -13,28 +13,25 @@ require File.expand_path('../source/strikingly_interview.rb', __FILE__)
 
 class Hangman
   attr_reader :source
-  attr_reader :guessed_chars, :matched_words
+  attr_reader :guessed_chars, :matched_words, :unmatched_words
 
   def initialize source
     @source = source
     @source.hangman = self
 
-    # check @source's methods
-    [:word, :make_a_guess, :give_me_a_word, :status, :success?].each do |m|
-      raise "#{@source}'s class #{@source.class} havent defined method :#{m}" if not @source.methods.include? m
-    end
-
     @guessed_chars = []
     @matched_words = nil
+    @unmatched_words = []
 
     return self
   end
 
   # delegate behaviors to @source
-  def network_success?; @source.success?  end
-  def word; @source.word end
-  def done?; word && word.count('*').zero? end
-  def init_guess; @source.give_me_a_word end
+  require 'active_support/core_ext/module/delegation.rb'
+  Hangman::Source::InstanceMethods.each do |m|
+    delegate m, :to => :source
+  end
+  def done?; !!word && word.count('*').zero? end
 
   def guess
     raise "Please #init_guess first" if word.nil?
@@ -50,7 +47,7 @@ class Hangman
     @source.make_a_guess _current_guess_char
 
     # Number of Allowed Guess on this word is 0, please get a new word
-    return false if @source.status == 400
+    return false if not @source.network_success?
 
     begin
     if network_success? && @matched_words # compactible with herokuapp error
@@ -61,14 +58,20 @@ class Hangman
         word.chars.each_with_index do |_char, idx|
           next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
           @matched_words = @matched_words & Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
+          @matched_words -= @unmatched_words
         end
         # 排除 包含匹配字母, 但是不在相同位置的 单词
+        word_idxes = idxes_of_char_in_the_word(word, _current_guess_char)
         @matched_words.delete_if do |w|
-          (idxes_of_char_in_the_word(w, _current_guess_char) - idxes_of_char_in_the_word(word, _current_guess_char)).any?
+          (idxes_of_char_in_the_word(w, _current_guess_char) - word_idxes).any?
         end
       else
         # reject no match words
-        @matched_words.delete_if {|w| w.to_s.include?(_current_guess_char) }
+        @matched_words.delete_if do |w|
+          _r = w.to_s.include?(_current_guess_char)
+          @unmatched_words << w if _r
+          _r
+        end
       end
       # break # 成功后继续猜 下一个字母
     end
