@@ -22,6 +22,7 @@ class HangmanTest < Test::Unit::TestCase
     def s.number_of_words_to_guess; 8000; end
     s.instance_variable_set("@words", Hangman::Words.dup.map(&:to_s).select {|w| w.length < 19 }.shuffle[0..(s.number_of_words_to_guess-1)])
     play_hangman s
+    # 猜单词结果是: {"numberOfWordsTried"=>8000, "numberOfCorrectWords"=>7664, "numberOfWrongGuesses"=>336, "totalScore"=>0}
   end
 
   def test_idxes_of_char_in_the_word
