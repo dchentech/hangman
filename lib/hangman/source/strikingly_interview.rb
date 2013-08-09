@@ -37,6 +37,7 @@ class Hangman
     end
 
     def word; current_response['word'] end
+    # TODO 统一给所有request机上
     def init_guess
       s = give_me_a_word
       # compatible with network error at the first time
@@ -61,14 +62,26 @@ class Hangman
     def network_success?; @current_response.success? end
 
     def request data = {}
-      HTTParty.post(REQUEST_URL, {
+      opts = {
         :headers => {"Content-Type" => "application/json"},
         :body => ({
           :action  => "initiateGame",
           :userId  => @user_id,
           :secret => @secret
         }).merge(data).to_json
-      })
+      }
+
+      result  = nil
+      while true do
+        begin
+          result = HTTParty.post(REQUEST_URL, opts)
+          break if result && result.success?
+        rescue Timeout::Error, EOFError
+          sleep 3
+          next
+        end
+      end
+      result
     end
 
     def inspect
