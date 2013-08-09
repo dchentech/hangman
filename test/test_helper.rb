@@ -17,9 +17,13 @@ $LOAD_PATH.unshift File.dirname(__FILE__) # test dirs
 
 require 'hangman'
 
-class HangmanTest < Test::Unit::TestCase
+puts "单词长度对应的所有单词总数表"
+Hangman::Length_to__words_count_hash.each {|k,v| puts "#{k}:#{v}" }
+puts
+
+
+class Test::Unit::TestCase
   def play_hangman source
-     #  require 'pry-debugger';binding.pry
     1.upto(source.number_of_words_to_guess) do |time|
       @hangman = Hangman.new(source)
       @hangman.init_guess
@@ -31,11 +35,10 @@ class HangmanTest < Test::Unit::TestCase
         @hangman.guess
         begin
           sleep 3 if not source.network_success?
-        rescue Timeout::Error => e
+        rescue Timeout::Error, EOFError => e
           next
         rescue => e
           e.class; require 'pry-debugger'; binding.pry
-          # TODO EOFError: end of file reached
         end
       end; print "\n"
 
@@ -61,14 +64,4 @@ class HangmanTest < Test::Unit::TestCase
     return score
   end 
 
-
-  def test_idxes_of_char_in_the_word
-    @hangman = Hangman.new(Struct.new(:hangman).new)
-    assert_equal @hangman.idxes_of_char_in_the_word('WOOD', 'O'), [1, 2]
-  end
-
 end
-
-puts "单词长度对应的所有单词总数表"
-Hangman::Length_to__words_count_hash.each {|k,v| puts "#{k}:#{v}" }
-puts

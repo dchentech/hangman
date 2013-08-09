@@ -2,7 +2,8 @@
 
 class Hangman
   class Local < Source
-    def initialize user_id = nil
+    def initialize _words = nil
+      @words = _words
       @words ||= Hangman::Words.dup.map(&:to_s).select {|w| w.length < 19 }.shuffle[0..(number_of_words_to_guess-1)]
       @numberOfWordsTried = 0
 

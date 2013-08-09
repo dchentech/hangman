@@ -45,6 +45,8 @@ class Hangman
     _current_guess_char = current_guess_char
     return false if _current_guess_char.nil?
     @source.make_a_guess _current_guess_char
+    setup_matched_words
+    #require 'pry-debugger'; binding.pry
 
     # Number of Allowed Guess on this word is 0, please get a new word
     return false if not @source.network_success?
@@ -90,22 +92,9 @@ class Hangman
       _char = (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].keys - @guessed_chars).first
     # 第二步: 查找剩余字母，直到找完位置
     else
-      # 依据上面匹配字母及其位置找到所有符合单词
-    # require 'pry-debugger'; binding.pry
-      if not @matched_words
-        matched_words_array = matched_chars_with_idx.map do |_char_with_idx|
-          Length_to__char_num_to_words__hash[word_length][_char_with_idx]
-        end
-        if matched_words_array.size.zero?
-          puts "no matched word" 
-          return nil
-        end
-        matched_words_array.each do |_a1|
-          @matched_words ||= _a1
-          @matched_words = @matched_words & _a1
-        end
-      end
-      # 如果所有单词都不匹配
+      setup_matched_words
+      
+      # 如果词典中所有单词都不匹配
       return nil if @matched_words.size.zero?
 
       # 并求出接下来的字母及其位置
@@ -192,6 +181,23 @@ class Hangman
       _filter.call(c1, idx, a)
     end
     return a
+  end
+
+  def setup_matched_words
+    # 依据上面匹配字母及其位置找到所有符合单词
+    if @matched_words.nil? && ((word_length - word.count('*')) > 0)
+      matched_words_array = matched_chars_with_idx.map do |_char_with_idx|
+        Length_to__char_num_to_words__hash[word_length][_char_with_idx]
+      end
+      if matched_words_array.size.zero?
+        puts "no matched word" 
+        return nil
+      end
+      matched_words_array.each do |_a1|
+        @matched_words ||= _a1
+        @matched_words = @matched_words & _a1
+      end
+    end
   end
 
 end
