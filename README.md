@@ -53,9 +53,8 @@ Ruby程序优化原则
 
 问题
 -------------------------------
-a. 猜词策略，元音和辅音间隔猜。
-b. 一般不能超过十次，现在平均是十二次
-c. 贝叶斯bayes?但是位置信息已经是最大概率。
+* 猜词策略，元音和辅音间隔猜。
+* 贝叶斯bayes?但是位置信息已经是最大概率。
 
 
 作为一个程序员，我先是选择算法和其他现成做法
@@ -70,3 +69,16 @@ http://stackoverflow.com/questions/16223305/algorithm-for-classifying-words-for-
 https://github.com/freizl/play-hangman-game/
 
 
+Top scores in other place
+-------------------------------
+http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
+Problems Submitted	 57
+Problems Correct	 49
+Submission Accuracy	 85.96%
+Problems Failed by Challenge	 7
+Problems Failed by System Test	 1
+Challenge Attempts Made	 12
+Challenge Accuracy	 58.33%
+Best Time	0:04:13.448	0:03:12.509
+Fastest	Ruberik
+Average Correct Time	0:13:05.750
