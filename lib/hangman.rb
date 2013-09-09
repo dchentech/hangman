@@ -166,6 +166,7 @@ class Hangman
       _c1 ||= _chars[_c1_idx] # 兼容元音数量少的情况
       break if _chars.size.zero?
 
+      # TODO 好像有错误, 不是detect
       is_has_match = !!(rest_asterisk_idxes.detect do |_idx|
         _result = Length_to__char_num_to_words__hash[word_length]["#{_c1}#{_idx}".to_sym]
 

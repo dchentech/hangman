@@ -18,10 +18,12 @@ class HangmanTest < Test::Unit::TestCase
     sleep 3
 
     # 测试8000个单词
+    if nil
     s = Hangman::Local.new
     def s.number_of_words_to_guess; 8000; end
-    s.instance_variable_set("@words", Hangman::Words.dup.map(&:to_s).select {|w| w.length < 19 }.shuffle[0..(s.number_of_words_to_guess-1)])
+    s.instance_variable_set("@words", Hangman::Words.dup.map(&:to_s).select {|w| w.chars.to_a.uniq.length <= 10 }.shuffle[0..(s.number_of_words_to_guess-1)])
     play_hangman s
+    end
     # 猜单词结果是: {"numberOfWordsTried"=>8000, "numberOfCorrectWords"=>7664, "numberOfWrongGuesses"=>336, "totalScore"=>0}
   end
 

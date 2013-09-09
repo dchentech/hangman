@@ -100,6 +100,17 @@ __END__
 ZETA应该被排除掉
 
 
+
+该单词长度为13， 可以猜10 次。
+10.删除了741个单词
+10.删除了37个单词
+10.删除了0个单词
+10.
+第71个单词 => 失败
+依次猜过的3个字母: ["I", "C", "A"]
+最终匹配结果 #<Hangman::StrikinglyInterview:3fc3345bf8c4 @user_id="mvjome@gmail.com", @current_response=#<HTTParty::Response:0x7f866d4341d0 parsed_response={"word"=>"C***A**I*A***", "userId"=>"mvjome@gmail.com", "secret"=>"7OXP61ISCVUNMITZRKEN1PWFA5G66R", "status"=>200, "data"=>{"numberOfWordsTried"=>71, "numberOfGuessAllowedForThisWord"=>10}}, @response=#<Net::HTTPOK 200 OK readbody=true>, @headers={"access-control-allow-headers"=>["X-Requested-With,Content-Type"], "access-control-allow-methods"=>["GET,PUT,POST,DELETE"], "access-control-allow-origin"=>["*"], "content-type"=>["application/json; charset=utf-8"], "date"=>["Sat, 10 Aug 2013 04:44:53 GMT"], "x-powered-by"=>["Express"], "content-length"=>["177"], "connection"=>["Close"]}>>
+还没猜完的0个单词: []
+
 Started
 ...删除了706个单词
 ..该单词长度为4， 可以猜10 次。

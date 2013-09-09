@@ -29,7 +29,7 @@ class Test::Unit::TestCase
       @hangman.init_guess
 
       puts "该单词长度为#{source.word.to_s.size}， 可以猜#{source.remain_time} 次。"
-      while (!@hangman.done? && !source.remain_time.zero?) || !source.network_success? do # 兼容网络错误
+      while (!@hangman.done? && !source.remain_time.zero?) do
         print "#{source.remain_time}."
 
         # TODO 兼容不在词典里的，策略是give me a new word
@@ -37,7 +37,7 @@ class Test::Unit::TestCase
           break # no candidate letters, and @hangman will not connect source any more
         end
 
-        if not @hangman.network_success?
+        if not @hangman.network_success? # 兼容网络错误
           @hangman = Hangman.new(source)
           @hangman.init_guess
         end
@@ -78,7 +78,7 @@ class Test::Unit::TestCase
     puts "猜单词结果是: #{result.inspect}"
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       # TODO 多个进程共享最大猜测数
-      source.submit_test_results if score > 67 # TODO update
+      source.submit_test_results if score >= 69 # TODO update
     end if @scores
     return score
   end 
