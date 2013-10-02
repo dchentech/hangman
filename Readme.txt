@@ -1,1 +1,1 @@
-see README.md
+see README.markdown

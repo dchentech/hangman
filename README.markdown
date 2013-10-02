@@ -1,9 +1,10 @@
 Hangman
 ===============================
-In its purest form, hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
+Hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
 
 Requirement
 -------------------------------
+```text
 Types of Words
 Plural
 Tenses
@@ -14,6 +15,7 @@ Among the 80 words to guess, there will be in different lengths
 21st to 40th word : length <= 8 characters
 41st to 60th word : length <= 12 characters
 61st to 80th word : length > 12 characters
+```
 
 核心思想
 -------------------------------
@@ -26,10 +28,12 @@ Let me give an example: If we have a six letter word, our first letter to guess 
 复杂度估计
 -------------------------------
 a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
+
 b. 最少是该单词唯一字母的个数，所以一般来说底线是单词长度。
 
 步骤
 -------------------------------
+```text
 1
 第一个猜的字母用统计数据的词频，返回可能部分被*掩盖的单词，
 1.1 如果是A或I，判断就终止了;
@@ -44,6 +48,7 @@ b. 最少是该单词唯一字母的个数，所以一般来说底线是单词�
 2.2
 如果是两个以上字母，那么剩余的字母频度就从这个过滤好的单词列表里继续抽取了，
 如此反复，直到最终找到那个单词为止。
+```
 
 Ruby程序优化原则
 -------------------------------
@@ -56,21 +61,22 @@ Ruby程序优化原则
 * 猜词策略，元音和辅音间隔猜。
 * 贝叶斯bayes?但是位置信息已经是最大概率。
 
-
 作为一个程序员，我先是选择算法和其他现成做法
-https://github.com/spydez/hangman hanman solver program for job interview
-http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
-http://www.learnstreet.com/cg/simple/project/hangman-ruby
-http://en.wikipedia.org/wiki/Hangman_(game)
-http://zh.wikipedia.org/wiki/字母频率
-https://github.com/fredley/pyngman/blob/master/pyngman.py
-https://docs.google.com/document/d/18s9i0SKThDasIAb3WgTxxSkz2QEjAT9sVyJFQXMpB1I/edit 七种武器：从一个算法的多语言实现看编程语言的横向对比
-http://stackoverflow.com/questions/16223305/algorithm-for-classifying-words-for-hangman-difficulty-levels-as-easy-medium
-https://github.com/freizl/play-hangman-game/
+
+* https://github.com/spydez/hangman hanman solver program for job interview
+* http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
+* http://www.learnstreet.com/cg/simple/project/hangman-ruby
+* http://en.wikipedia.org/wiki/Hangman_(game)
+* http://zh.wikipedia.org/wiki/字母频率
+* https://github.com/fredley/pyngman/blob/master/pyngman.py
+* https://docs.google.com/document/d/18s9i0SKThDasIAb3WgTxxSkz2QEjAT9sVyJFQXMpB1I/edit 七种武器：从一个算法的多语言实现看编程语言的横向对比
+* http://stackoverflow.com/questions/16223305/algorithm-for-classifying-words-for-hangman-difficulty-levels-as-easy-medium
+* https://github.com/freizl/play-hangman-game/
 
 
 Top scores in other place
 -------------------------------
+```text
 http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
 Problems Submitted	 57
 Problems Correct	 49
@@ -82,3 +88,4 @@ Challenge Accuracy	 58.33%
 Best Time	0:04:13.448	0:03:12.509
 Fastest	Ruberik
 Average Correct Time	0:13:05.750
+```
