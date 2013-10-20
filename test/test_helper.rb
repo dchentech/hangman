@@ -59,7 +59,7 @@ class Test::Unit::TestCase
       puts "第#{time}个单词 => #{@hangman.done? ? '成功' : '失败'}"
       puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
       puts "最终匹配结果 #{@hangman.source.inspect}"
-        
+
       if (@hangman.matched_words.count == 1) && (@hangman.matched_words[0].to_s == @hangman.word)
         puts "猜中的单词是#{@hangman.word}！"
       else
@@ -81,6 +81,6 @@ class Test::Unit::TestCase
       source.submit_test_results if score >= 69 # TODO update
     end if @scores
     return score
-  end 
+  end
 
 end

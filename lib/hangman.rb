@@ -44,7 +44,7 @@ class Hangman
 
     _current_guess_char = current_guess_char
     return "no char" if _current_guess_char.nil?
-    @source.make_a_guess _current_guess_char
+    source_result = @source.make_a_guess _current_guess_char
 
     # 兼容一个都没有匹配
     @matched_words ||= [] if @source.remain_time.zero?
@@ -81,6 +81,7 @@ class Hangman
           aa << _w
           s
         end
+        print("-[#{source_result['word']}]-")
         puts "删除了#{aa.size}个单词"
 
       else
@@ -109,7 +110,7 @@ class Hangman
     # 第二步: 查找剩余字母，直到找完位置
     else
       setup_matched_words
-      
+
       # 如果词典中所有单词都不匹配
       if @matched_words.nil?
         require 'pry-debugger'; binding.pry
@@ -207,7 +208,7 @@ class Hangman
         Length_to__char_num_to_words__hash[word_length][_char_with_idx]
       end
       if matched_words_array.size.zero?
-        puts "no matched word" 
+        puts "no matched word"
         return nil
       end
       matched_words_array.each do |_a1|

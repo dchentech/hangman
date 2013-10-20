@@ -22,7 +22,7 @@ class Hangman
       raise "no word anymore" if @word.nil?
       @marked_word_hash = (0..(@word.length-1)).inject({}) {|h, n| h[n] = '*'; h }
     end
-    
+
     def make_a_guess char
       _old_asterisk_count = @marked_word_hash.values.count('*')
 
@@ -72,7 +72,7 @@ class Hangman
           "numberOfCorrectWords" => @numberOfCorrectWords,
           "numberOfWrongGuesses" => (@numberOfWordsTried - @numberOfCorrectWords),
           "totalScore" => @totalScore,
-        }          
+        }
       else
         {
           "numberOfWordsTried" => @numberOfWordsTried,
