@@ -10,7 +10,6 @@ class HangmanTest < Test::Unit::TestCase
     #@h = Hangman.new(@local1)
   end
 
-
   def test_local
     # 测试80个单词
     play_hangman Hangman::Local.new
@@ -82,7 +81,7 @@ class HangmanTest < Test::Unit::TestCase
     @h.init_guess
 
     15.times { @h.guess }
-  end
+  end if ENV['ALL']
 
   private
   def hg words

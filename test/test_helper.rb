@@ -18,17 +18,22 @@ $LOAD_PATH.unshift File.dirname(__FILE__) # test dirs
 require 'hangman'
 
 puts "单词长度对应的所有单词总数表"
-Hangman::Length_to__words_count_hash.each {|k,v| puts "#{k}:#{v}" }
+Hangman::Length_to__words_count_hash.sort_by {|kv| kv[0] }.each {|k,v| puts "#{k.to_s.rjust(5, ' ')} : #{v}" }
 puts
-
 
 class Test::Unit::TestCase
   def play_hangman source
+    puts "\n" * 3
+    puts "#"*80
+    str = "开始猜#{source.number_of_words_to_guess}个单词"; puts "#{' ' * ((80-str.bytesize) / 2).round(0)}#{str}"
+    puts "#"*80
+    puts
     1.upto(source.number_of_words_to_guess) do |time|
       @hangman = Hangman.new(source)
       @hangman.init_guess
 
-      puts "该单词长度为#{source.word.to_s.size}， 可以猜#{source.remain_time} 次。"
+      puts "-" * 80
+      puts "猜测第#{time}个单词，长度为#{source.word.to_s.size}，可以猜#{source.remain_time}次。"
       while (!@hangman.done? && !source.remain_time.zero?) do
         print "#{source.remain_time}."
 
@@ -43,7 +48,8 @@ class Test::Unit::TestCase
         end
 
         if @hangman.source.current_response.nil? || @hangman.source.current_response.inspect.match(/HTTPServiceUnavailable/)
-          require 'pry-debugger';binding.pry
+          # TODO
+          raise "network error."
         end
 
         begin
@@ -51,23 +57,22 @@ class Test::Unit::TestCase
         rescue Timeout::Error, EOFError => e
           next
         rescue => e
-          e.class; require 'pry-debugger'; binding.pry
+          e.class
         end
-      end; print "\n"
+      end
 
       begin
-      puts "第#{time}个单词 => #{@hangman.done? ? '成功' : '失败'}"
-      puts "依次猜过的#{@hangman.guessed_chars.count}个字母: #{@hangman.guessed_chars.inspect}"
-      puts "最终匹配结果 #{@hangman.source.inspect}"
+      puts "[状态]            #{@hangman.done? ? '成功' : '失败'}"
+      puts "[依次猜过的字母]  #{@hangman.guessed_chars.inspect}，公#{@hangman.guessed_chars.count}个"
 
       if (@hangman.matched_words.count == 1) && (@hangman.matched_words[0].to_s == @hangman.word)
-        puts "猜中的单词是#{@hangman.word}！"
+        puts "[猜中的单词是]    #{@hangman.word}！"
       else
-        puts "还没猜完的#{@hangman.matched_words.count}个单词: #{@hangman.matched_words.inspect}"
+        puts "[还没猜完的单词]  #{@hangman.matched_words.inspect} 这#{@hangman.matched_words.count}个单词"
       end
       puts
       rescue => e
-       require 'pry-debugger';binding.pry
+        raise e
       end
 
     end
@@ -75,6 +80,7 @@ class Test::Unit::TestCase
     result = source.get_test_results['data']
     total = result['numberOfWordsTried'].to_f
     score = result['numberOfCorrectWords'].to_f
+    puts "-" * 80
     puts "猜单词结果是: #{result.inspect}"
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       # TODO 多个进程共享最大猜测数

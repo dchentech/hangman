@@ -52,8 +52,6 @@ class Hangman
     return false if not @source.network_success?
     setup_matched_words
 
-    #require 'pry-debugger'; binding.pry
-
     # Number of Allowed Guess on this word is 0, please get a new word
 
     begin
@@ -95,7 +93,7 @@ class Hangman
       # break # 成功后继续猜 下一个字母
     end
     rescue => e
-      e.class; require 'pry-debugger'; binding.pry
+      e.class
     end
 
     return _current_guess_char
@@ -113,7 +111,6 @@ class Hangman
 
       # 如果词典中所有单词都不匹配
       if @matched_words.nil?
-        require 'pry-debugger'; binding.pry
       end
       return nil if @matched_words.size.zero?
 

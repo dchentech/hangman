@@ -12,8 +12,6 @@ class Hangman
       @totalScore = 0 # TODO
     end
 
-
-
     def give_me_a_word
       @numberOfWordsTried += 1
       @numberOfGuessAllowedForThisWord = 10
@@ -82,8 +80,9 @@ class Hangman
     end
 
     def inspect
-      "#<#{self.class}:#{self.object_id.to_s(16)} @guessed_chars=#{@guessed_chars.inspect} @matched_words=#{@matched_words.inspect} @guessed_time=#{@guessed_time} @word=#{@word} @current_response=#{@current_response}>"
+      "#<#{self.class}:#{self.object_id.to_s(16)} @guessed_time=#{@guessed_time} @word=#{@word} @current_response=#{@current_response}>"
     end
 
   end
+
 end

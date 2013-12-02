@@ -18,9 +18,7 @@ class Hangman
       :remain_time,
     ]
 
-
   end
-
 end
 
 require File.expand_path("./../source/local.rb", __FILE__)
