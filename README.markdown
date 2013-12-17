@@ -1,8 +1,25 @@
-Hangman
+红宝石 大战 Hangman
 ===============================
 Hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
+游戏背景和具体规则可以参考 [中文Wiki](http://zh.wikipedia.org/zh-cn/猜单词游戏) 。
 
-游戏背景和具体规则可以参考 [中文Wiki](http://zh.wikipedia.org/zh-cn/猜单词游戏)
+目前成绩
+-------------------------------
+我在网上搜了下别人的，在topcoder上的最佳成绩在86%左右。而现在我这个基于Ruby语言开发的Hangman项目，在给定80个未知单词的情况下，该程序目前猜对率平均在95%以上，有时可以达到100%。
+
+```text
+http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
+Problems Submitted	 57
+Problems Correct	 49
+Submission Accuracy	 85.96%
+Problems Failed by Challenge	 7
+Problems Failed by System Test	 1
+Challenge Attempts Made	 12
+Challenge Accuracy	 58.33%
+Best Time	0:04:13.448	0:03:12.509
+Fastest	Ruberik
+Average Correct Time	0:13:05.750
+```
 
 核心思想
 -------------------------------
@@ -14,7 +31,7 @@ a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
 
 b. 最少是该单词唯一字母的个数，所以一般来说底线是单词长度。
 
-步骤
+解题步骤
 -------------------------------
 ```text
 0
@@ -1195,20 +1212,4 @@ Finished in 9.71616 seconds.
 18:26:56 - INFO - Guard is now watching at '/Users/mvj3/github/mvj3/hangman'
 [1] guard(main)> 
 
-```
-
-Top scores in other place
--------------------------------
-```text
-http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
-Problems Submitted	 57
-Problems Correct	 49
-Submission Accuracy	 85.96%
-Problems Failed by Challenge	 7
-Problems Failed by System Test	 1
-Challenge Attempts Made	 12
-Challenge Accuracy	 58.33%
-Best Time	0:04:13.448	0:03:12.509
-Fastest	Ruberik
-Average Correct Time	0:13:05.750
 ```
