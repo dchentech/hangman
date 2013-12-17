@@ -7,20 +7,6 @@ Hangman is a word game played between two people. One person selects a secret wo
 -------------------------------
 我在网上搜了下别人的，在topcoder上的最佳成绩在86%左右。而现在我这个基于Ruby语言开发的Hangman项目，在给定80个未知单词的情况下，该程序目前猜对率平均在95%以上，有时可以达到100%。
 
-```text
-http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
-Problems Submitted	 57
-Problems Correct	 49
-Submission Accuracy	 85.96%
-Problems Failed by Challenge	 7
-Problems Failed by System Test	 1
-Challenge Attempts Made	 12
-Challenge Accuracy	 58.33%
-Best Time	0:04:13.448	0:03:12.509
-Fastest	Ruberik
-Average Correct Time	0:13:05.750
-```
-
 核心思想
 -------------------------------
 贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
@@ -1212,4 +1198,21 @@ Finished in 9.71616 seconds.
 18:26:56 - INFO - Guard is now watching at '/Users/mvj3/github/mvj3/hangman'
 [1] guard(main)> 
 
+```
+
+Top scores in other place
+-------------------------------
+
+```text
+http://community.topcoder.com/tc?module=ProblemDetail&rd=4770&pm=2343
+Problems Submitted	 57
+Problems Correct	 49
+Submission Accuracy	 85.96%
+Problems Failed by Challenge	 7
+Problems Failed by System Test	 1
+Challenge Attempts Made	 12
+Challenge Accuracy	 58.33%
+Best Time	0:04:13.448	0:03:12.509
+Fastest	Ruberik
+Average Correct Time	0:13:05.750
 ```
