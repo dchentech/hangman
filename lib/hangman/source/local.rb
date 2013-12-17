@@ -26,13 +26,15 @@ class Hangman
 
       is_not_desc_remain_only_already = true
       @word.chars.to_a.each_with_index do |_c, idx|
+        # 这次 如果猜中了
         if char == _c
-          if (remain_time > 0) && is_not_desc_remain_only_already
-            @guessed_time += 1
-            is_not_desc_remain_only_already = false
-          end
           @marked_word_hash[idx] = _c 
+          is_not_desc_remain_only_already = false
         end
+      end
+      # 这次 没猜中就给 @guessed_time 加一次一
+      if is_not_desc_remain_only_already && (remain_time > 0)
+        @guessed_time += 1
       end
 
       if @marked_word_hash.values.count('*') < _old_asterisk_count
