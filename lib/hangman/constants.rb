@@ -56,6 +56,8 @@ EOF
   # {5   => { :e2      => hello } }
   # {7   => { :g4      => hangman } }
   #
+  # 用Activity Monitor测量加载该数据结构后，内存占有增加80MB左右。
+  #
   # TODO 其他数据结构，但这个只能提高查找效率，不能减少猜字母的次数。
   # {:len_char_pos => words }
   # {:len => {char => { pos => words } } }
