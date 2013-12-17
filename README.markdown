@@ -2,6 +2,8 @@ Hangman
 ===============================
 Hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
 
+游戏背景和具体规则可以参考 [中文Wiki](http://zh.wikipedia.org/zh-cn/猜单词游戏)
+
 核心思想
 -------------------------------
 贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
