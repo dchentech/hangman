@@ -79,7 +79,7 @@ class Hangman
           s
         end
         print("-[#{source_result['word']}]-")
-        puts "删除了#{aa.size}个单词"
+        puts "排除了#{aa.size}个单词"
 
       else
         # reject no match words
