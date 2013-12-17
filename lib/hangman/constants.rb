@@ -52,6 +52,9 @@ EOF
 
   # 建立有位置信息的字母 映射到 单词 的哈希表
   # {len => { :char_pos => words } }
+  # 例子
+  # {5   => { :e2      => hello } }
+  # {7   => { :g4      => hangman } }
   #
   # TODO 其他数据结构，但这个只能提高查找效率，不能减少猜字母的次数。
   # {:len_char_pos => words }
@@ -69,5 +72,5 @@ EOF
     h
   end
   Length_to__words_count_hash = _h
-  Length_to__char_num_to_words__hash.keys
+
 end
