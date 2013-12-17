@@ -83,6 +83,14 @@ class HangmanTest < Test::Unit::TestCase
     15.times { @h.guess }
   end if ENV['ALL']
 
+  # 测试需要14次错误
+  def test_rhythm
+    @h = Hangman.new(Hangman::Local.new(%w[RHYTHM]))
+    @h.init_guess
+
+    11.times { @h.guess }
+  end if ENV['RHYTHM']
+
   private
   def hg words
     s = Hangman.new(Hangman::Local.new(words))
