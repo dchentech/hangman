@@ -35,7 +35,6 @@ class Hangman
 
   def guess
     raise "Please #init_guess first" if word.nil?
-    #require 'pry-debugger'; binding.pry
 
     # 退出，比如全部都是重复字母，包括一两个字母，比如A, AA
     return false if matched_chars_with_idx.length == word_length
@@ -200,6 +199,9 @@ class Hangman
 
   def setup_matched_words
     # 依据上面匹配字母及其位置找到所有符合单词
+    #
+    # 不初始化 @matched_words 为 空数组的原因是要用到其为nil的情况
+    #
     if @matched_words.nil? && ((word_length - word.count('*')) > 0)
       matched_words_array = matched_chars_with_idx.map do |_char_with_idx|
         Length_to__char_num_to_words__hash[word_length][_char_with_idx]

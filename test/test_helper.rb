@@ -23,17 +23,21 @@ puts
 
 class Test::Unit::TestCase
   def play_hangman source
+    # 打印要猜的单词数量，并格式化
     puts "\n" * 3
     puts "#"*80
     str = "开始猜#{source.number_of_words_to_guess}个单词"; puts "#{' ' * ((80-str.bytesize) / 2).round(0)}#{str}"
     puts "#"*80
     puts
+
+    # 把单词一个一个猜完
     1.upto(source.number_of_words_to_guess) do |time|
       @hangman = Hangman.new(source)
       @hangman.init_guess
 
-      puts "-" * 80
-      puts "猜测第#{time}个单词，长度为#{source.word.to_s.size}，可以猜#{source.remain_time}次。"
+      # 开始猜测某一个单词
+      print " "; puts "-" * 80
+      puts "猜测第#{time}个单词，长度为#{source.word.to_s.size}，可以猜错#{source.remain_time}次。"
       while (!@hangman.done? && !source.remain_time.zero?) do
         print "#{source.remain_time}."
 
@@ -42,15 +46,17 @@ class Test::Unit::TestCase
           break # no candidate letters, and @hangman will not connect source any more
         end
 
+# TODO 还需处理
+=begin
         if not @hangman.network_success? # 兼容网络错误
           @hangman = Hangman.new(source)
           @hangman.init_guess
         end
 
         if @hangman.source.current_response.nil? || @hangman.source.current_response.inspect.match(/HTTPServiceUnavailable/)
-          # TODO
           raise "network error."
         end
+=end
 
         begin
           sleep 3 if not source.network_success?
@@ -63,7 +69,7 @@ class Test::Unit::TestCase
 
       begin
       puts "[状态]            #{@hangman.done? ? '成功' : '失败'}"
-      puts "[依次猜过的字母]  #{@hangman.guessed_chars.inspect}，公#{@hangman.guessed_chars.count}个"
+      puts "[依次猜过的字母]  #{@hangman.guessed_chars.inspect}，共#{@hangman.guessed_chars.count}个"
 
       if (@hangman.matched_words.count == 1) && (@hangman.matched_words[0].to_s == @hangman.word)
         puts "[猜中的单词是]    #{@hangman.word}！"
@@ -80,7 +86,7 @@ class Test::Unit::TestCase
     result = source.get_test_results['data']
     total = result['numberOfWordsTried'].to_f
     score = result['numberOfCorrectWords'].to_f
-    puts "-" * 80
+    print " "; puts "-" * 80
     puts "猜单词结果是: #{result.inspect}"
     if ((score / total) > 0.75) && (score > @scores.max.to_i)
       # TODO 多个进程共享最大猜测数

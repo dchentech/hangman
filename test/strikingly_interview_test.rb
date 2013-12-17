@@ -1,4 +1,7 @@
 # encoding: UTF-8
+#
+# NOTE 该remote测试不保证使用了，还是看local测试吧
+#
 
 require File.expand_path('../test_helper.rb', __FILE__)
 
