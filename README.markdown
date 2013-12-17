@@ -6,10 +6,6 @@ Hangman is a word game played between two people. One person selects a secret wo
 -------------------------------
 贪婪算法，每次排除掉尽可能多的单词，让猜测步骤尽可能少。
 
-[?]用字母位置信息 解决统计的字母非关联缺陷
-http://www.datagenetics.com/blog/april12012/index.html
-Let me give an example: If we have a six letter word, our first letter to guess should be 'E'. If the letter 'E' is not in the solution, we should not necessarily try the letter 'S' next (which is what the above table implies)!
-
 复杂度估计
 -------------------------------
 a. 最笨的次数是猜20次以上，也就是枚举所有字母了。
@@ -19,13 +15,15 @@ b. 最少是该单词唯一字母的个数，所以一般来说底线是单词�
 步骤
 -------------------------------
 ```text
+0
+返回单词长度这步就不说了
 1
 第一个猜的字母用统计数据的词频，返回可能部分被*掩盖的单词，
 1.1 如果是A或I，判断就终止了;
 1.2 如果全是*，继续字母频度的下一个;
 1.3 如果不全是*，那么进入第二步
 2
-在第一步里我们知道了单词的长度，
+在 1 里我们知道了单词的长度，
 那么第二个猜的字母根据刚才含有位置信息的字母去找到字典索引找到全部匹配的单词列表，
 并统计其中字母频度，并按该结果取出第二个字母（第一个我们刚才用掉了嘛），
 并一直直到确认第二个字母匹配。
@@ -40,12 +38,13 @@ Ruby程序优化原则
 1. 使用Symbol节省内存
 2. 使用Hash O(1) 查找
 
-问题
+问题和参考
 -------------------------------
 * 猜词策略，元音和辅音间隔猜。
-* 贝叶斯bayes?但是位置信息已经是最大概率。
+* 采用贝叶斯bayes? 但是位置信息已经是最大概率。
+* 写一篇Hangman概率论文，猜中牛津词典里全部单词最少需要几步。
 
-作为一个程序员，我先是选择算法和其他现成做法
+作为一个程序员，我先是选择算法和其他现成做法。以下为其他参考:
 
 * https://github.com/spydez/hangman hanman solver program for job interview
 * http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/258405
