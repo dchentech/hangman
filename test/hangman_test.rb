@@ -61,7 +61,7 @@ class HangmanTest < Test::Unit::TestCase
     assert_equal nil, @h.matched_words
     assert_equal "O", @h.guess
     assert_equal "*O**", @h.word
-    assert_equal false, @h.matched_words.size.zero?
+    #assert_equal false, @h.matched_words.size.zero?
     # require 'pry-debugger'; binding.pry
     @h.guess
   end

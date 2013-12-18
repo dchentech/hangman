@@ -5,12 +5,6 @@ require File.expand_path('../hangman/constants.rb', __FILE__)
 require File.expand_path('../hangman/ruby.rb', __FILE__)
 require File.expand_path('../hangman/source.rb', __FILE__)
 
-# TODO log words and their unmatched words to database
-# TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
-# 并发测试，网络速度太慢 =》 开启多个guard
-# TODO http://www.datagenetics.com/blog/april12012/index.html#result
-# TODO 记录下猜不到的单词的相关信息，下次可以优先根据其中相反的词频猜。
-
 class Hangman
   attr_reader :source
   attr_reader :guessed_chars, :matched_words, :unmatched_words
@@ -71,7 +65,10 @@ class Hangman
         end
 
         # 排除 包含匹配字母, 但是 *不在相同位置* 的单词
+        #
+        # A. 服务器返回来的 可能有*的word
         word_idxes = idxes_of_char_in_the_word(word, _current_guess_char)
+        # B. 客户端自己用于排除的单词列表
         aa = []
         @matched_words.delete_if do |_w|
           s = (idxes_of_char_in_the_word(_w, _current_guess_char) - word_idxes).any?
@@ -81,6 +78,7 @@ class Hangman
         print("-[#{source_result['word']}]-")
         puts "排除了#{aa.size}个单词"
 
+      # 这次猜测没匹配！
       else
         # reject no match words
         @matched_words.delete_if do |w|
@@ -104,13 +102,20 @@ class Hangman
     # 第一步: 依据词典词频找出第一个匹配的字母及其一或多个位置
     when word_length
       _char = (Hash[range.map {|num| PopularityOfLettersInLength[num] }.flatten.frequencies].keys - @guessed_chars).first
-    # 第二步: 查找剩余字母，直到找完位置
+    # 第二步: 查找剩余字母，直到找完为止
     else
       setup_matched_words
 
+      # 过滤 在没匹配到一个char时 包含之前猜过的chars的单词们
+=begin
+      $hello ||= false # 只执行一次
+      @matched_words.delete_if do |w1|
+        $hello = true
+        @guessed_chars.detect {|c2| w1.to_s.include? c2 }
+      end if not $hello
+=end
+
       # 如果词典中所有单词都不匹配
-      if @matched_words.nil?
-      end
       return nil if @matched_words.size.zero?
 
       # 并求出接下来的字母及其位置
@@ -210,18 +215,27 @@ class Hangman
         puts "no matched word"
         return nil
       end
+      # 取正交集合
       matched_words_array.each do |_a1|
         @matched_words ||= _a1
         @matched_words = @matched_words & _a1
       end
+
     end
   end
 
 end
 
 
+# 日志输出
 class Hangman
   def self.word_recorder
     @@word_recorder ||= Logger.new(File.expand_path("../../strikingly_words.txt", __FILE__))
   end
 end
+
+# TODO log words and their unmatched words to database
+# TODO Can I skip a word? Yes! send another "Give Me A Word" request, i.e. "action":"nextWord"
+# 并发测试，网络速度太慢 =》 开启多个guard
+# TODO http://www.datagenetics.com/blog/april12012/index.html#result
+# TODO 记录下猜不到的单词的相关信息，下次可以优先根据其中相反的词频猜。
