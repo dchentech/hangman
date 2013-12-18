@@ -3,6 +3,12 @@
 Hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
 游戏背景和具体规则可以参考 [中文Wiki](http://zh.wikipedia.org/zh-cn/猜单词游戏) 。
 
+项目地址在 https://github.com/mvj3/hangman
+
+如果单纯想看策略的话，推荐看 @luikore 基于决策树写的 [a-hangman](https://gist.github.com/luikore/8011242) 更精妙的实现，他把单词频率和位置信息在决策树里融为一体了，准确率高达99.3125%。我稍微加了点 [注释](https://gist.github.com/mvj3/8016738) 。
+
+如果想看一个项目如何在有时间限制下解决开发中各种问题，那就看我这个项目的 [commit信息](https://github.com/mvj3/hangman/commits/master) 好了。
+
 目前成绩
 -------------------------------
 我在网上搜了下别人的，在topcoder上的最佳成绩在86%左右。而现在我这个基于Ruby语言开发的Hangman项目，在给定80个未知单词的情况下，该程序目前猜对率平均在95%以上，有时可以达到100%。
