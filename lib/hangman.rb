@@ -57,7 +57,7 @@ class Hangman
         # @return e.g. { char => [3, 5] }
         word.chars.each_with_index do |_char, idx|
           # 排除*或已经做过的
-          next if (_char == '*') || @guessed_chars[0..-2].include?(_char)
+          next if (_char == '*') || (@guessed_chars[-1] != _char)
 
           ws = Length_to__char_num_to_words__hash[word_length]["#{_char}#{idx}".to_sym]
           @matched_words = @matched_words & (ws || [])
