@@ -7,7 +7,7 @@ Hangman is a word game played between two people. One person selects a secret wo
 
 如果单纯想看策略的话，推荐看 @luikore 基于决策树写的 [a-hangman](https://gist.github.com/luikore/8011242) 更精妙的实现，他把单词频率和位置信息在决策树里融为一体了，准确率高达99.3125%。我稍微加了点 [注释](https://gist.github.com/mvj3/8016738) 。
 
-如果想看一个项目如何在有时间限制下解决开发中各种问题，那就看我这个项目的 [commit信息](https://github.com/mvj3/hangman/commits/master) 好了。
+如果想看一个项目如何在有时间限制下解决开发中各种问题，那就看我这个项目的 [commit信息](https://github.com/mvj3/hangman/commits/master) 好了。关于开发过程的两天描述请详见 [人类思维和软件工程学](http://mvj3.github.io/2013/12/15/human-mind-and-software-engineering/) 的 #混沌时代# 。
 
 目前成绩
 -------------------------------
