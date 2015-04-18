@@ -5,6 +5,6 @@ gem 'httparty'
 gem 'activesupport'
 
 group :development do
-  gem 'pry-debugger'
+  gem 'pry-byebug'
   gem 'guard-test'
 end

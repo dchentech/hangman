@@ -1,4 +1,4 @@
-红宝石 大战 Hangman
+红宝石 大战 Hangman [![Build Status](https://travis-ci.org/mvj3/hangman.png)](https://travis-ci.org/mvj3/hangman)
 ===============================
 Hangman is a word game played between two people. One person selects a secret word, and the other tries to determine the word by guessing it letter-by-letter.
 游戏背景和具体规则可以参考 [中文Wiki](http://zh.wikipedia.org/zh-cn/猜单词游戏) 。

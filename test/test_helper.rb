@@ -1,6 +1,5 @@
 # encoding: UTF-8
 
-require File.join(ENV['HOME'], 'utils/ruby/irb') rescue nil
 require 'rubygems'
 require 'bundler'
 begin
